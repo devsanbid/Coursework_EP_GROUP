@@ -1,0 +1,129 @@
+match_id_unique,team,opposition,match_result,match_date,venue,season,toss_winner,toss_decision,won,lost,tied,toss_won
+S1_M1,Biratnagar Kings (NPL),Janakpur Bolts (NPL),Loss,2024-11-30,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,0,1,0,0
+S1_M1,Janakpur Bolts (NPL),Biratnagar Kings (NPL),Win,2024-11-30,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,1,0,0,1
+S1_M10,Chitwan Rhinos (NPL),Karnali Yaks (NPL),Loss,2024-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",1,Karnali Yaks (NPL),Bowl,0,1,0,0
+S1_M10,Karnali Yaks (NPL),Chitwan Rhinos (NPL),Win,2024-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",1,Karnali Yaks (NPL),Bowl,1,0,0,1
+S1_M11,Lumbini Lions (NPL),Pokhara Avengers (NPL),Loss,2024-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bat,0,1,0,1
+S1_M11,Pokhara Avengers (NPL),Lumbini Lions (NPL),Win,2024-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bat,1,0,0,0
+S1_M12,Lumbini Lions (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bowl,0,1,0,1
+S1_M12,Sudur Paschim Royals (NPL),Lumbini Lions (NPL),Win,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bowl,1,0,0,0
+S1_M13,Biratnagar Kings (NPL),Karnali Yaks (NPL),Loss,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,0,1,0,1
+S1_M13,Karnali Yaks (NPL),Biratnagar Kings (NPL),Win,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,1,0,0,0
+S1_M14,Janakpur Bolts (NPL),Lumbini Lions (NPL),Win,2024-12-08,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bowl,1,0,0,0
+S1_M14,Lumbini Lions (NPL),Janakpur Bolts (NPL),Loss,2024-12-08,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Bowl,0,1,0,1
+S1_M15,Chitwan Rhinos (NPL),Sudur Paschim Royals (NPL),Win,2024-12-08,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bat,1,0,0,1
+S1_M15,Sudur Paschim Royals (NPL),Chitwan Rhinos (NPL),Loss,2024-12-08,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bat,0,1,0,0
+S1_M16,Chitwan Rhinos (NPL),Lumbini Lions (NPL),Loss,2024-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bowl,0,1,0,1
+S1_M16,Lumbini Lions (NPL),Chitwan Rhinos (NPL),Win,2024-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bowl,1,0,0,0
+S1_M17,Karnali Yaks (NPL),Pokhara Avengers (NPL),Win,2024-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Bat,1,0,0,0
+S1_M17,Pokhara Avengers (NPL),Karnali Yaks (NPL),Loss,2024-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Bat,0,1,0,1
+S1_M18,Janakpur Bolts (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,0,1,0,1
+S1_M18,Sudur Paschim Royals (NPL),Janakpur Bolts (NPL),Win,2024-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,1,0,0,0
+S1_M19,Kathmandu Gurkhas (NPL),Lumbini Lions (NPL),Win,2024-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bat,1,0,0,1
+S1_M19,Lumbini Lions (NPL),Kathmandu Gurkhas (NPL),Loss,2024-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bat,0,1,0,0
+S1_M2,Chitwan Rhinos (NPL),Kathmandu Gurkhas (NPL),Win,2024-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bowl,1,0,0,1
+S1_M2,Kathmandu Gurkhas (NPL),Chitwan Rhinos (NPL),Loss,2024-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bowl,0,1,0,0
+S1_M20,Biratnagar Kings (NPL),Pokhara Avengers (NPL),Tie,2024-12-12,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bat,0,0,1,1
+S1_M20,Pokhara Avengers (NPL),Biratnagar Kings (NPL),Tie,2024-12-12,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bat,0,0,1,0
+S1_M21,Janakpur Bolts (NPL),Kathmandu Gurkhas (NPL),Win,2024-12-12,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bat,1,0,0,0
+S1_M21,Kathmandu Gurkhas (NPL),Janakpur Bolts (NPL),Loss,2024-12-12,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bat,0,1,0,1
+S1_M22,Karnali Yaks (NPL),Lumbini Lions (NPL),Win,2024-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Field,1,0,0,0
+S1_M22,Lumbini Lions (NPL),Karnali Yaks (NPL),Loss,2024-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",1,Lumbini Lions (NPL),Field,0,1,0,1
+S1_M23,Biratnagar Kings (NPL),Chitwan Rhinos (NPL),Win,2024-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bat,1,0,0,1
+S1_M23,Chitwan Rhinos (NPL),Biratnagar Kings (NPL),Loss,2024-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bat,0,1,0,0
+S1_M24,Kathmandu Gurkhas (NPL),Pokhara Avengers (NPL),Win,2024-12-14,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Field,1,0,0,1
+S1_M24,Pokhara Avengers (NPL),Kathmandu Gurkhas (NPL),Loss,2024-12-14,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Field,0,1,0,0
+S1_M25,Chitwan Rhinos (NPL),Janakpur Bolts (NPL),Win,2024-12-14,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bat,1,0,0,1
+S1_M25,Janakpur Bolts (NPL),Chitwan Rhinos (NPL),Loss,2024-12-14,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Bat,0,1,0,0
+S1_M26,Biratnagar Kings (NPL),Kathmandu Gurkhas (NPL),Loss,2024-12-15,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Field,0,1,0,0
+S1_M26,Kathmandu Gurkhas (NPL),Biratnagar Kings (NPL),Win,2024-12-15,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Field,1,0,0,1
+S1_M27,Pokhara Avengers (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-15,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Field,0,1,0,1
+S1_M27,Sudur Paschim Royals (NPL),Pokhara Avengers (NPL),Win,2024-12-15,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Field,1,0,0,0
+S1_M28,Karnali Yaks (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-16,"Tribhuvan University International Cricket Ground, Kirtipur",1,Sudur Paschim Royals (NPL),Field,0,1,0,0
+S1_M28,Sudur Paschim Royals (NPL),Karnali Yaks (NPL),Win,2024-12-16,"Tribhuvan University International Cricket Ground, Kirtipur",1,Sudur Paschim Royals (NPL),Field,1,0,0,1
+S1_M29,Chitwan Rhinos (NPL),Karnali Yaks (NPL),Loss,2024-12-18,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Field,0,1,0,1
+S1_M29,Karnali Yaks (NPL),Chitwan Rhinos (NPL),Win,2024-12-18,"Tribhuvan University International Cricket Ground, Kirtipur",1,Chitwan Rhinos (NPL),Field,1,0,0,0
+S1_M3,Janakpur Bolts (NPL),Karnali Yaks (NPL),Win,2024-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",1,Karnali Yaks (NPL),Bat,1,0,0,0
+S1_M3,Karnali Yaks (NPL),Janakpur Bolts (NPL),Loss,2024-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",1,Karnali Yaks (NPL),Bat,0,1,0,1
+S1_M30,Janakpur Bolts (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-18,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bat,0,1,0,1
+S1_M30,Sudur Paschim Royals (NPL),Janakpur Bolts (NPL),Win,2024-12-18,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bat,1,0,0,0
+S1_M31,Janakpur Bolts (NPL),Karnali Yaks (NPL),Win,2024-12-19,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Field,1,0,0,1
+S1_M31,Karnali Yaks (NPL),Janakpur Bolts (NPL),Loss,2024-12-19,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Field,0,1,0,0
+S1_M32,Janakpur Bolts (NPL),Sudur Paschim Royals (NPL),Win,2024-12-21,"Tribhuvan University International Cricket Ground, Kirtipur",1,Sudur Paschim Royals (NPL),Bat,1,0,0,0
+S1_M32,Sudur Paschim Royals (NPL),Janakpur Bolts (NPL),Loss,2024-12-21,"Tribhuvan University International Cricket Ground, Kirtipur",1,Sudur Paschim Royals (NPL),Bat,0,1,0,1
+S1_M4,Biratnagar Kings (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,0,1,0,1
+S1_M4,Sudur Paschim Royals (NPL),Biratnagar Kings (NPL),Win,2024-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,1,0,0,0
+S1_M5,Chitwan Rhinos (NPL),Pokhara Avengers (NPL),Win,2024-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Bowl,1,0,0,0
+S1_M5,Pokhara Avengers (NPL),Chitwan Rhinos (NPL),Loss,2024-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",1,Pokhara Avengers (NPL),Bowl,0,1,0,1
+S1_M6,Karnali Yaks (NPL),Kathmandu Gurkhas (NPL),Loss,2024-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bowl,0,1,0,0
+S1_M6,Kathmandu Gurkhas (NPL),Karnali Yaks (NPL),Win,2024-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bowl,1,0,0,1
+S1_M7,Biratnagar Kings (NPL),Lumbini Lions (NPL),Win,2024-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,1,0,0,1
+S1_M7,Lumbini Lions (NPL),Biratnagar Kings (NPL),Loss,2024-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",1,Biratnagar Kings (NPL),Bowl,0,1,0,0
+S1_M8,Janakpur Bolts (NPL),Pokhara Avengers (NPL),Win,2024-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,1,0,0,1
+S1_M8,Pokhara Avengers (NPL),Janakpur Bolts (NPL),Loss,2024-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",1,Janakpur Bolts (NPL),Bowl,0,1,0,0
+S1_M9,Kathmandu Gurkhas (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bowl,0,1,0,1
+S1_M9,Sudur Paschim Royals (NPL),Kathmandu Gurkhas (NPL),Win,2024-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",1,Kathmandu Gurkhas (NPL),Bowl,1,0,0,0
+S2_M1,Janakpur Bolts (NPL),Kathmandu Gurkhas (NPL),Loss,2025-11-17,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Field,0,1,0,0
+S2_M1,Kathmandu Gurkhas (NPL),Janakpur Bolts (NPL),Win,2025-11-17,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Field,1,0,0,1
+S2_M10,Karnali Yaks (NPL),Sudur Paschim Royals (NPL),Loss,2025-11-24,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Field,0,1,0,1
+S2_M10,Sudur Paschim Royals (NPL),Karnali Yaks (NPL),Win,2025-11-24,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Field,1,0,0,0
+S2_M11,Kathmandu Gurkhas (NPL),Lumbini Lions (NPL),Win,2025-11-25,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,1,0,0,0
+S2_M11,Lumbini Lions (NPL),Kathmandu Gurkhas (NPL),Loss,2025-11-25,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,0,1,0,1
+S2_M12,Lumbini Lions (NPL),Sudur Paschim Royals (NPL),Loss,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,0,1,0,1
+S2_M12,Sudur Paschim Royals (NPL),Lumbini Lions (NPL),Win,2024-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,1,0,0,0
+S2_M13,Lumbini Lions (NPL),Sudur Paschim Royals (NPL),Loss,2025-11-27,"Tribhuvan University International Cricket Ground, Kirtipur",2,Sudur Paschim Royals (NPL),Field,0,1,0,0
+S2_M13,Sudur Paschim Royals (NPL),Lumbini Lions (NPL),Win,2025-11-27,"Tribhuvan University International Cricket Ground, Kirtipur",2,Sudur Paschim Royals (NPL),Field,1,0,0,1
+S2_M14,Janakpur Bolts (NPL),Pokhara Avengers (NPL),Loss,2025-11-27,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Bat,0,1,0,0
+S2_M14,Pokhara Avengers (NPL),Janakpur Bolts (NPL),Win,2025-11-27,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Bat,1,0,0,1
+S2_M15,Chitwan Rhinos (NPL),Kathmandu Gurkhas (NPL),Loss,2025-11-28,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,0,1,0,1
+S2_M15,Kathmandu Gurkhas (NPL),Chitwan Rhinos (NPL),Win,2025-11-28,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,1,0,0,0
+S2_M16,Biratnagar Kings (NPL),Karnali Yaks (NPL),Win,2025-11-28,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,1,0,0,0
+S2_M16,Karnali Yaks (NPL),Biratnagar Kings (NPL),Loss,2025-11-28,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,0,1,0,1
+S2_M17,Lumbini Lions (NPL),Pokhara Avengers (NPL),Win,2025-11-29,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,1,0,0,1
+S2_M17,Pokhara Avengers (NPL),Lumbini Lions (NPL),Loss,2025-11-29,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Bat,0,1,0,0
+S2_M18,Janakpur Bolts (NPL),Sudur Paschim Royals (NPL),Loss,2025-11-29,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Bat,0,1,0,1
+S2_M18,Sudur Paschim Royals (NPL),Janakpur Bolts (NPL),Win,2025-11-29,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Bat,1,0,0,0
+S2_M19,Karnali Yaks (NPL),Kathmandu Gurkhas (NPL),Loss,2025-11-30,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,0,1,0,1
+S2_M19,Kathmandu Gurkhas (NPL),Karnali Yaks (NPL),Win,2025-11-30,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,1,0,0,0
+S2_M2,Chitwan Rhinos (NPL),Karnali Yaks (NPL),Win,2025-11-18,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,1,0,0,1
+S2_M2,Karnali Yaks (NPL),Chitwan Rhinos (NPL),Loss,2025-11-18,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,0,1,0,0
+S2_M20,Chitwan Rhinos (NPL),Janakpur Bolts (NPL),Loss,2025-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Bat,0,1,0,1
+S2_M20,Janakpur Bolts (NPL),Chitwan Rhinos (NPL),Win,2025-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Bat,1,0,0,0
+S2_M21,Karnali Yaks (NPL),Pokhara Avengers (NPL),Loss,2025-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,0,1,0,1
+S2_M21,Pokhara Avengers (NPL),Karnali Yaks (NPL),Win,2025-12-02,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Bat,1,0,0,0
+S2_M22,Biratnagar Kings (NPL),Lumbini Lions (NPL),Loss,2025-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Bat,0,1,0,0
+S2_M22,Lumbini Lions (NPL),Biratnagar Kings (NPL),Win,2025-12-03,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,1,0,0,1
+S2_M23,Kathmandu Gurkhas (NPL),Pokhara Avengers (NPL),Win,2025-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Bat,1,0,0,0
+S2_M23,Pokhara Avengers (NPL),Kathmandu Gurkhas (NPL),Loss,2025-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Field,0,1,0,1
+S2_M24,Chitwan Rhinos (NPL),Sudur Paschim Royals (NPL),Loss,2025-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,0,1,0,1
+S2_M24,Sudur Paschim Royals (NPL),Chitwan Rhinos (NPL),Win,2025-12-04,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Bat,1,0,0,0
+S2_M25,Janakpur Bolts (NPL),Lumbini Lions (NPL),Loss,2025-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Bat,0,1,0,1
+S2_M25,Lumbini Lions (NPL),Janakpur Bolts (NPL),Win,2025-12-05,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Bat,1,0,0,0
+S2_M26,Biratnagar Kings (NPL),Sudur Paschim Royals (NPL),Win,2025-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Field,1,0,0,1
+S2_M26,Sudur Paschim Royals (NPL),Biratnagar Kings (NPL),Loss,2025-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Bat,0,1,0,0
+S2_M27,Chitwan Rhinos (NPL),Pokhara Avengers (NPL),Loss,2025-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Bat,0,1,0,1
+S2_M27,Pokhara Avengers (NPL),Chitwan Rhinos (NPL),Win,2025-12-06,"Tribhuvan University International Cricket Ground, Kirtipur",2,Chitwan Rhinos (NPL),Field,1,0,0,0
+S2_M28,Janakpur Bolts (NPL),Karnali Yaks (NPL),Loss,2025-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Field,0,1,0,1
+S2_M28,Karnali Yaks (NPL),Janakpur Bolts (NPL),Win,2025-12-07,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Bat,1,0,0,0
+S2_M29,Biratnagar Kings (NPL),Sudur Paschim Royals (NPL),Loss,2025-12-09,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Field,0,1,0,1
+S2_M29,Sudur Paschim Royals (NPL),Biratnagar Kings (NPL),Win,2025-12-09,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Bat,1,0,0,0
+S2_M3,Biratnagar Kings (NPL),Pokhara Avengers (NPL),Win,2025-11-18,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Field,1,0,0,0
+S2_M3,Pokhara Avengers (NPL),Biratnagar Kings (NPL),Loss,2025-11-18,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Field,0,1,0,1
+S2_M30,Kathmandu Gurkhas (NPL),Lumbini Lions (NPL),Loss,2025-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Bat,0,1,0,1
+S2_M30,Lumbini Lions (NPL),Kathmandu Gurkhas (NPL),Win,2025-12-10,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Field,1,0,0,0
+S2_M31,Biratnagar Kings (NPL),Lumbini Lions (NPL),Loss,2025-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Field,0,1,0,1
+S2_M31,Lumbini Lions (NPL),Biratnagar Kings (NPL),Win,2025-12-11,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Bat,1,0,0,0
+S2_M32,Lumbini Lions (NPL),Sudur Paschim Royals (NPL),Win,2025-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",2,Sudur Paschim Royals (NPL),Field,1,0,0,0
+S2_M32,Sudur Paschim Royals (NPL),Lumbini Lions (NPL),Loss,2025-12-13,"Tribhuvan University International Cricket Ground, Kirtipur",2,Sudur Paschim Royals (NPL),Bat,0,1,0,1
+S2_M4,Kathmandu Gurkhas (NPL),Sudur Paschim Royals (NPL),Loss,2025-11-19,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Field,0,1,0,1
+S2_M4,Sudur Paschim Royals (NPL),Kathmandu Gurkhas (NPL),Win,2025-11-19,"Tribhuvan University International Cricket Ground, Kirtipur",2,Kathmandu Gurkhas (NPL),Field,1,0,0,0
+S2_M5,Chitwan Rhinos (NPL),Lumbini Lions (NPL),Loss,2025-11-20,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,0,1,0,0
+S2_M5,Lumbini Lions (NPL),Chitwan Rhinos (NPL),Win,2025-11-20,"Tribhuvan University International Cricket Ground, Kirtipur",2,Lumbini Lions (NPL),Field,1,0,0,1
+S2_M6,Pokhara Avengers (NPL),Sudur Paschim Royals (NPL),Loss,2025-11-21,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Field,0,1,0,1
+S2_M6,Sudur Paschim Royals (NPL),Pokhara Avengers (NPL),Win,2025-11-21,"Tribhuvan University International Cricket Ground, Kirtipur",2,Pokhara Avengers (NPL),Field,1,0,0,0
+S2_M7,Karnali Yaks (NPL),Lumbini Lions (NPL),Win,2025-11-22,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Field,1,0,0,1
+S2_M7,Lumbini Lions (NPL),Karnali Yaks (NPL),Loss,2025-11-22,"Tribhuvan University International Cricket Ground, Kirtipur",2,Karnali Yaks (NPL),Field,0,1,0,0
+S2_M8,Biratnagar Kings (NPL),Kathmandu Gurkhas (NPL),Win,2025-11-22,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Field,1,0,0,1
+S2_M8,Kathmandu Gurkhas (NPL),Biratnagar Kings (NPL),Loss,2025-11-22,"Tribhuvan University International Cricket Ground, Kirtipur",2,Biratnagar Kings (NPL),Field,0,1,0,0
+S2_M9,Biratnagar Kings (NPL),Janakpur Bolts (NPL),Win,2025-11-24,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Field,1,0,0,0
+S2_M9,Janakpur Bolts (NPL),Biratnagar Kings (NPL),Loss,2025-11-24,"Tribhuvan University International Cricket Ground, Kirtipur",2,Janakpur Bolts (NPL),Field,0,1,0,1

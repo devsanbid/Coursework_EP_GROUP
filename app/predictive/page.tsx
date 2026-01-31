@@ -434,57 +434,371 @@ export default function PredictivePage() {
     const { jsPDF } = await import("jspdf");
     const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 20;
+    const contentWidth = pageWidth - (margin * 2);
 
-    pdf.setFontSize(24);
-    pdf.setTextColor(79, 70, 229);
-    pdf.text("NPL Match Prediction Report", pageWidth / 2, 20, { align: "center" });
+    // Helper function to draw rounded rectangle
+    const drawRoundedRect = (x: number, y: number, w: number, h: number, r: number, fill: string) => {
+      pdf.setFillColor(fill);
+      pdf.roundedRect(x, y, w, h, r, r, 'F');
+    };
 
-    pdf.setFontSize(12);
-    pdf.setTextColor(100, 100, 100);
-    pdf.text("Advanced Predictive Analysis", pageWidth / 2, 30, { align: "center" });
-    pdf.text(`Generated: ${new Date().toLocaleDateString()}`, pageWidth / 2, 37, { align: "center" });
+    // Helper function to draw progress bar
+    const drawProgressBar = (x: number, y: number, width: number, percentage: number, color: string) => {
+      pdf.setFillColor("#334155");
+      pdf.roundedRect(x, y, width, 4, 2, 2, 'F');
+      pdf.setFillColor(color);
+      pdf.roundedRect(x, y, width * (percentage / 100), 4, 2, 2, 'F');
+    };
 
-    // Match Details
-    pdf.setFontSize(14);
-    pdf.setTextColor(0, 0, 0);
-    pdf.text("Match Details", 20, 55);
+    // Helper to draw donut chart
+    const drawDonutChart = (centerX: number, centerY: number, outerR: number, innerR: number, percentage: number) => {
+      // Draw background (loss)
+      pdf.setFillColor("#EF4444");
+      pdf.circle(centerX, centerY, outerR, 'F');
+      
+      // Draw win percentage arc using multiple small segments
+      pdf.setFillColor("#22C55E");
+      const segments = Math.floor(percentage * 3.6); // 360 degrees * percentage/100
+      for (let i = 0; i < segments; i++) {
+        const angle1 = (i - 90) * Math.PI / 180;
+        const angle2 = (i + 1 - 90) * Math.PI / 180;
+        const x1 = centerX + Math.cos(angle1) * outerR;
+        const y1 = centerY + Math.sin(angle1) * outerR;
+        const x2 = centerX + Math.cos(angle2) * outerR;
+        const y2 = centerY + Math.sin(angle2) * outerR;
+        pdf.triangle(centerX, centerY, x1, y1, x2, y2, 'F');
+      }
+      
+      // Draw inner circle (hole)
+      pdf.setFillColor("#1E293B");
+      pdf.circle(centerX, centerY, innerR, 'F');
+    };
 
+    // ===== PAGE 1: MAIN PREDICTION =====
+    
+    // Header background
+    drawRoundedRect(margin, 10, contentWidth, 35, 3, "#4F46E5");
+    
+    pdf.setFontSize(22);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("NPL Match Prediction Report", pageWidth / 2, 25, { align: "center" });
+    
     pdf.setFontSize(11);
-    pdf.text(`${team1.replace(" (NPL)", "")} vs ${team2.replace(" (NPL)", "")}`, 25, 65);
-    pdf.text(`Toss Winner: ${tossWinner ? tossWinner.replace(" (NPL)", "") : "Not specified"}`, 25, 72);
-    pdf.text(`Venue: ${venue === "home1" ? `${team1.replace(" (NPL)", "")} Home` : venue === "home2" ? `${team2.replace(" (NPL)", "")} Home` : "Neutral"}`, 25, 79);
+    pdf.text("Advanced AI-Powered Predictive Analysis", pageWidth / 2, 35, { align: "center" });
 
-    // Prediction Result
-    pdf.setFontSize(16);
-    pdf.setTextColor(34, 197, 94);
-    pdf.text(`Predicted Winner: ${prediction.team.replace(" (NPL)", "")} (${prediction.winProbability.toFixed(1)}%)`, 20, 95);
-
+    // Match Info Card
+    let yPos = 55;
+    drawRoundedRect(margin, yPos, contentWidth, 30, 3, "#1E293B");
+    
     pdf.setFontSize(10);
-    pdf.setTextColor(0, 0, 0);
-    let yPos = 110;
+    pdf.setTextColor(148, 163, 184);
+    pdf.text("MATCH DETAILS", margin + 5, yPos + 8);
+    
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(`${team1.replace(" (NPL)", "")}  vs  ${team2.replace(" (NPL)", "")}`, margin + 5, yPos + 18);
+    
+    pdf.setFontSize(9);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(`Toss: ${tossWinner ? tossWinner.replace(" (NPL)", "") : "Not specified"}  |  Venue: ${venue === "home1" ? `${team1.replace(" (NPL)", "")} Home` : venue === "home2" ? `${team2.replace(" (NPL)", "")} Home` : "Neutral"}  |  Generated: ${new Date().toLocaleDateString()}`, margin + 5, yPos + 26);
 
-    // Factors
+    // Winner Prediction Card
+    yPos = 95;
+    drawRoundedRect(margin, yPos, contentWidth, 55, 3, "#14532D");
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(134, 239, 172);
+    pdf.text("🏆 PREDICTED WINNER", margin + 5, yPos + 10);
+    
+    pdf.setFontSize(24);
+    pdf.setTextColor(74, 222, 128);
+    pdf.text(prediction.team.replace(" (NPL)", ""), margin + 5, yPos + 28);
+    
+    // Draw donut chart
+    drawDonutChart(pageWidth - margin - 30, yPos + 27, 18, 10, prediction.winProbability);
+    
     pdf.setFontSize(12);
-    pdf.text("Key Prediction Factors:", 20, yPos);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text(`${prediction.winProbability.toFixed(1)}%`, pageWidth - margin - 30, yPos + 30, { align: "center" });
+    
+    pdf.setFontSize(9);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(`Confidence: ${prediction.confidence}  |  Model Accuracy: ~72%`, margin + 5, yPos + 40);
+    
+    // Score Prediction
+    pdf.setFontSize(10);
+    pdf.setTextColor(255, 255, 255);
+    const team1Score = Math.round((prediction.scorePrediction.team1.min + prediction.scorePrediction.team1.max) / 2);
+    const team2Score = Math.round((prediction.scorePrediction.team2.min + prediction.scorePrediction.team2.max) / 2);
+    pdf.text(`Predicted Score: ${team1Score} vs ${team2Score}`, margin + 5, yPos + 50);
+
+    // Prediction Factors
+    yPos = 160;
+    pdf.setFontSize(12);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("📊 PREDICTION FACTORS", margin, yPos);
     yPos += 10;
 
-    pdf.setFontSize(9);
-    prediction.factors.slice(0, 5).forEach((f) => {
-      pdf.text(`• ${f.factor}: ${f.description}`, 25, yPos);
-      yPos += 7;
+    prediction.factors.forEach((factor, idx) => {
+      if (yPos > pageHeight - 30) return;
+      
+      drawRoundedRect(margin, yPos, contentWidth, 18, 2, factor.impact > 0 ? "#14532D" : factor.impact < 0 ? "#7F1D1D" : "#1E293B");
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(factor.factor, margin + 5, yPos + 7);
+      
+      pdf.setFontSize(9);
+      pdf.setTextColor(factor.impact > 0 ? "#86EFAC" : factor.impact < 0 ? "#FCA5A5" : "#94A3B8");
+      pdf.text(`${factor.impact > 0 ? "+" : ""}${factor.impact.toFixed(1)}%`, pageWidth - margin - 5, yPos + 7, { align: "right" });
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      const desc = factor.description.length > 80 ? factor.description.substring(0, 80) + "..." : factor.description;
+      pdf.text(desc, margin + 5, yPos + 14);
+      
+      yPos += 22;
     });
 
-    // Score Prediction
-    yPos += 5;
-    pdf.setFontSize(12);
-    pdf.text("Score Prediction:", 20, yPos);
-    yPos += 10;
-    pdf.setFontSize(10);
-    pdf.text(`${team1.replace(" (NPL)", "")}: ${prediction.scorePrediction.team1.min}-${prediction.scorePrediction.team1.max}`, 25, yPos);
-    yPos += 7;
-    pdf.text(`${team2.replace(" (NPL)", "")}: ${prediction.scorePrediction.team2.min}-${prediction.scorePrediction.team2.max}`, 25, yPos);
+    // ===== PAGE 2: HEAD TO HEAD & COMPARISON =====
+    pdf.addPage();
+    
+    // Header
+    drawRoundedRect(margin, 10, contentWidth, 20, 3, "#4F46E5");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Head-to-Head Analysis & Team Comparison", pageWidth / 2, 23, { align: "center" });
 
-    pdf.save(`match-prediction-${Date.now()}.pdf`);
+    // Head to Head
+    yPos = 40;
+    drawRoundedRect(margin, yPos, contentWidth, 45, 3, "#1E293B");
+    
+    pdf.setFontSize(10);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text("HEAD-TO-HEAD RECORD", margin + 5, yPos + 10);
+    
+    const totalH2H = prediction.headToHead.team1Wins + prediction.headToHead.team2Wins + prediction.headToHead.ties;
+    const team1H2HPercent = totalH2H > 0 ? (prediction.headToHead.team1Wins / totalH2H) * 100 : 50;
+    
+    // Team 1 stats
+    pdf.setFontSize(20);
+    pdf.setTextColor(74, 222, 128);
+    pdf.text(String(prediction.headToHead.team1Wins), margin + 25, yPos + 28);
+    pdf.setFontSize(9);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(team1.replace(" (NPL)", ""), margin + 5, yPos + 38);
+    
+    // VS
+    pdf.setFontSize(12);
+    pdf.setTextColor(100, 116, 139);
+    pdf.text("vs", pageWidth / 2, yPos + 28, { align: "center" });
+    pdf.text(`${prediction.headToHead.ties} Ties`, pageWidth / 2, yPos + 38, { align: "center" });
+    
+    // Team 2 stats
+    pdf.setFontSize(20);
+    pdf.setTextColor(248, 113, 113);
+    pdf.text(String(prediction.headToHead.team2Wins), pageWidth - margin - 35, yPos + 28);
+    pdf.setFontSize(9);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text(team2.replace(" (NPL)", ""), pageWidth - margin - 5, yPos + 38, { align: "right" });
+    
+    // H2H Progress bar
+    drawProgressBar(margin + 5, yPos + 42, contentWidth - 10, team1H2HPercent, "#22C55E");
+
+    // Team Comparison Table
+    yPos = 95;
+    pdf.setFontSize(10);
+    pdf.setTextColor(148, 163, 184);
+    pdf.text("TEAM COMPARISON", margin, yPos);
+    yPos += 8;
+    
+    // Table header
+    drawRoundedRect(margin, yPos, contentWidth, 10, 2, "#334155");
+    pdf.setFontSize(9);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Metric", margin + 5, yPos + 7);
+    pdf.text(team1.replace(" (NPL)", ""), margin + 70, yPos + 7);
+    pdf.text(team2.replace(" (NPL)", ""), margin + 120, yPos + 7);
+    pdf.text("Edge", pageWidth - margin - 20, yPos + 7);
+    yPos += 12;
+    
+    const comparisons = [
+      { metric: "Avg Score", t1: prediction.team1Stats.avgScore.toFixed(0), t2: prediction.team2Stats.avgScore.toFixed(0), edge: prediction.team1Stats.avgScore > prediction.team2Stats.avgScore ? team1 : team2 },
+      { metric: "Strike Rate", t1: prediction.team1Stats.strikeRate.toFixed(1), t2: prediction.team2Stats.strikeRate.toFixed(1), edge: prediction.team1Stats.strikeRate > prediction.team2Stats.strikeRate ? team1 : team2 },
+      { metric: "Economy Rate", t1: prediction.team1Stats.economyRate.toFixed(2), t2: prediction.team2Stats.economyRate.toFixed(2), edge: prediction.team1Stats.economyRate < prediction.team2Stats.economyRate ? team1 : team2 },
+      { metric: "Avg Wickets", t1: prediction.team1Stats.avgWickets.toFixed(1), t2: prediction.team2Stats.avgWickets.toFixed(1), edge: prediction.team1Stats.avgWickets > prediction.team2Stats.avgWickets ? team1 : team2 },
+    ];
+    
+    comparisons.forEach((row, idx) => {
+      const bgColor = idx % 2 === 0 ? "#1E293B" : "#0F172A";
+      drawRoundedRect(margin, yPos, contentWidth, 10, 0, bgColor);
+      
+      pdf.setFontSize(9);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(row.metric, margin + 5, yPos + 7);
+      
+      const isT1Better = row.edge === team1;
+      if (isT1Better) {
+        pdf.setTextColor(74, 222, 128);
+      } else {
+        pdf.setTextColor(255, 255, 255);
+      }
+      pdf.text(row.t1, margin + 70, yPos + 7);
+      
+      if (!isT1Better) {
+        pdf.setTextColor(248, 113, 113);
+      } else {
+        pdf.setTextColor(255, 255, 255);
+      }
+      pdf.text(row.t2, margin + 120, yPos + 7);
+      
+      if (isT1Better) {
+        pdf.setTextColor(74, 222, 128);
+      } else {
+        pdf.setTextColor(248, 113, 113);
+      }
+      pdf.text(row.edge.replace(" (NPL)", "").split(" ")[0], pageWidth - margin - 20, yPos + 7);
+      
+      yPos += 12;
+    });
+
+    // ===== PAGE 3: KEY PLAYERS =====
+    pdf.addPage();
+    
+    // Header
+    drawRoundedRect(margin, 10, contentWidth, 20, 3, "#4F46E5");
+    pdf.setFontSize(14);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("Key Players to Watch", pageWidth / 2, 23, { align: "center" });
+    
+    yPos = 40;
+    
+    // Split players by team
+    const team1Players = prediction.keyPlayers.filter(p => p.team === team1);
+    const team2Players = prediction.keyPlayers.filter(p => p.team === team2);
+    
+    // Team 1 Players
+    pdf.setFontSize(11);
+    pdf.setTextColor(74, 222, 128);
+    pdf.text(`${team1.replace(" (NPL)", "")} Players`, margin, yPos);
+    yPos += 8;
+    
+    team1Players.forEach((player) => {
+      drawRoundedRect(margin, yPos, contentWidth / 2 - 5, 35, 2, "#14532D");
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(player.name, margin + 5, yPos + 10);
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(player.role, margin + 5, yPos + 17);
+      
+      // Form badge
+      const formColor = player.form === "Hot" ? "#F59E0B" : player.form === "Good" ? "#22C55E" : player.form === "Poor" ? "#EF4444" : "#6B7280";
+      pdf.setFillColor(formColor);
+      pdf.roundedRect(margin + 70, yPos + 5, 18, 6, 2, 2, 'F');
+      pdf.setFontSize(7);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(player.form, margin + 79, yPos + 9, { align: "center" });
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Predicted: ${player.predictedRuns} runs`, margin + 5, yPos + 25);
+      if (player.predictedWickets > 0) {
+        pdf.text(`${player.predictedWickets} wickets`, margin + 50, yPos + 25);
+      }
+      
+      // Impact bar
+      pdf.setTextColor(234, 179, 8);
+      pdf.text(`Impact: ${player.impactScore.toFixed(0)}%`, margin + 5, yPos + 32);
+      drawProgressBar(margin + 35, yPos + 29, 50, player.impactScore, "#EAB308");
+      
+      yPos += 40;
+    });
+    
+    // Team 2 Players
+    yPos = 40;
+    const xOffset = pageWidth / 2 + 5;
+    
+    pdf.setFontSize(11);
+    pdf.setTextColor(248, 113, 113);
+    pdf.text(`${team2.replace(" (NPL)", "")} Players`, xOffset, yPos);
+    yPos += 8;
+    
+    team2Players.forEach((player) => {
+      drawRoundedRect(xOffset, yPos, contentWidth / 2 - 5, 35, 2, "#7F1D1D");
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(player.name, xOffset + 5, yPos + 10);
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(player.role, xOffset + 5, yPos + 17);
+      
+      // Form badge
+      const formColor = player.form === "Hot" ? "#F59E0B" : player.form === "Good" ? "#22C55E" : player.form === "Poor" ? "#EF4444" : "#6B7280";
+      pdf.setFillColor(formColor);
+      pdf.roundedRect(xOffset + 70, yPos + 5, 18, 6, 2, 2, 'F');
+      pdf.setFontSize(7);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(player.form, xOffset + 79, yPos + 9, { align: "center" });
+      
+      pdf.setFontSize(8);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(`Predicted: ${player.predictedRuns} runs`, xOffset + 5, yPos + 25);
+      if (player.predictedWickets > 0) {
+        pdf.text(`${player.predictedWickets} wickets`, xOffset + 50, yPos + 25);
+      }
+      
+      // Impact bar
+      pdf.setTextColor(234, 179, 8);
+      pdf.text(`Impact: ${player.impactScore.toFixed(0)}%`, xOffset + 5, yPos + 32);
+      drawProgressBar(xOffset + 35, yPos + 29, 50, player.impactScore, "#EAB308");
+      
+      yPos += 40;
+    });
+
+    // Key Matchups section at bottom
+    yPos = Math.max(yPos, 170);
+    pdf.setFontSize(11);
+    pdf.setTextColor(255, 255, 255);
+    pdf.text("⚔️ Key Matchups", margin, yPos);
+    yPos += 8;
+    
+    prediction.keyMatchups.forEach((matchup, idx) => {
+      drawRoundedRect(margin, yPos, contentWidth, 20, 2, "#1E293B");
+      
+      pdf.setFontSize(9);
+      pdf.setTextColor(148, 163, 184);
+      pdf.text(matchup.reason, margin + 5, yPos + 7);
+      
+      pdf.setFontSize(10);
+      pdf.setTextColor(255, 255, 255);
+      pdf.text(`${matchup.batsman}  vs  ${matchup.bowler}`, margin + 5, yPos + 15);
+      
+      pdf.setFontSize(8);
+      const edgeColor = matchup.advantage === "Batsman" ? "#22C55E" : "#A855F7";
+      pdf.setTextColor(edgeColor);
+      pdf.text(`${matchup.advantage} Edge`, pageWidth - margin - 5, yPos + 12, { align: "right" });
+      
+      yPos += 25;
+    });
+
+    // Footer on all pages
+    const totalPages = pdf.getNumberOfPages();
+    for (let i = 1; i <= totalPages; i++) {
+      pdf.setPage(i);
+      pdf.setFontSize(8);
+      pdf.setTextColor(100, 116, 139);
+      pdf.text("NPL Analytics Dashboard | Predictions based on historical data | Not for betting purposes", pageWidth / 2, pageHeight - 10, { align: "center" });
+      pdf.text(`Page ${i} of ${totalPages}`, pageWidth - margin, pageHeight - 10, { align: "right" });
+    }
+
+    pdf.save(`NPL-Match-Prediction-${team1.replace(" (NPL)", "").replace(/\s+/g, "-")}-vs-${team2.replace(" (NPL)", "").replace(/\s+/g, "-")}-${Date.now()}.pdf`);
   };
 
   if (loading) {

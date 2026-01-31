@@ -64,14 +64,14 @@ export function Sidebar() {
         className={cn(
           "w-64 bg-slate-900/95 backdrop-blur-xl border-r border-slate-700/50 flex-shrink-0",
           "transition-transform duration-300 ease-in-out",
-          // Desktop: always visible, static positioning
-          "lg:relative lg:translate-x-0",
+          // Desktop: fixed positioning
+          "lg:fixed lg:inset-y-0 lg:left-0 lg:translate-x-0 lg:z-30",
           // Mobile: fixed positioning with slide animation
           "max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-40",
           isMobileOpen ? "max-lg:translate-x-0" : "max-lg:-translate-x-full"
         )}
       >
-        <div className="flex h-full flex-col">
+        <div className="flex h-full flex-col overflow-hidden">
           {/* Logo */}
           <div className="flex h-16 items-center gap-3 border-b border-slate-700/50 px-6">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600">
@@ -84,7 +84,7 @@ export function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-2 overflow-y-auto p-4">
+          <nav className="flex-1 space-y-2 p-4">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (

@@ -223,6 +223,8 @@ export default function PlayersPage() {
               ...teams.map(t => ({ value: t, label: t.replace(" (NPL)", "") })),
             ]}
             className="w-52"
+            searchable
+            searchPlaceholder="Search teams..."
           />
         </div>
       </div>
@@ -478,6 +480,8 @@ export default function PlayersPage() {
               onChange={setSelectedPlayer}
               options={[{ value: "", label: "Select a player..." }, ...playerOptions]}
               className="w-full"
+              searchable
+              searchPlaceholder="Search player..."
             />
             <Select
               label="Select Player 2 (Optional)"
@@ -485,6 +489,8 @@ export default function PlayersPage() {
               onChange={setComparePlayer}
               options={[{ value: "", label: "Select for comparison..." }, ...playerOptions]}
               className="w-full"
+              searchable
+              searchPlaceholder="Search player..."
             />
           </div>
 

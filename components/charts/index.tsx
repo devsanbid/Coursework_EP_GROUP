@@ -44,11 +44,11 @@ const CustomTooltip = ({ active, payload, label }: {
 }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="rounded-lg border border-slate-700 bg-slate-800/95 p-3 shadow-xl backdrop-blur-sm">
+      <div className="rounded-lg border border-slate-600 bg-slate-900 p-3 shadow-2xl">
         <p className="mb-2 text-sm font-medium text-white">{label}</p>
         {payload.map((entry, index) => (
-          <p key={index} className="text-xs" style={{ color: entry.color }}>
-            {entry.name}: <span className="font-semibold">{entry.value}</span>
+          <p key={index} className="text-xs" style={{ color: entry.color || '#94A3B8' }}>
+            {entry.name}: <span className="font-semibold text-white">{typeof entry.value === 'number' ? entry.value.toLocaleString() : entry.value}</span>
           </p>
         ))}
       </div>
@@ -77,7 +77,7 @@ export function WinLossBarChart({ data, showTies = false, className }: WinLossBa
             height={80}
           />
           <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Legend 
             wrapperStyle={{ paddingTop: "20px" }}
             formatter={(value) => <span className="text-slate-300">{value}</span>}
@@ -112,7 +112,7 @@ export function StackedBarChart({ data, keys, colors = COLORS, className }: Stac
             height={80}
           />
           <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Legend 
             wrapperStyle={{ paddingTop: "20px" }}
             formatter={(value) => <span className="text-slate-300">{value}</span>}
@@ -187,29 +187,44 @@ interface RadarChartProps {
 export function PlayerRadarChart({ data, player1Name, player2Name, className }: RadarChartProps) {
   return (
     <div className={className}>
-      <ResponsiveContainer width="100%" height={350}>
-        <RadarChart cx="50%" cy="50%" outerRadius="80%" data={data}>
-          <PolarGrid stroke="#374151" />
-          <PolarAngleAxis dataKey="subject" tick={{ fill: '#9CA3AF', fontSize: 11 }} />
-          <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#9CA3AF', fontSize: 10 }} />
+      <ResponsiveContainer width="100%" height={450}>
+        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
+          <PolarGrid stroke="#374151" strokeDasharray="3 3" />
+          <PolarAngleAxis 
+            dataKey="subject" 
+            tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 500 }}
+            tickLine={false}
+          />
+          <PolarRadiusAxis 
+            angle={90} 
+            domain={[0, 100]} 
+            tick={{ fill: '#64748B', fontSize: 8 }}
+            tickCount={5}
+            axisLine={false}
+          />
           <Radar
             name={player1Name}
             dataKey="player1"
             stroke="#8338EC"
+            strokeWidth={2}
             fill="#8338EC"
-            fillOpacity={0.4}
+            fillOpacity={0.35}
+            dot={{ fill: '#8338EC', strokeWidth: 0, r: 4 }}
           />
           {player2Name && (
             <Radar
               name={player2Name}
               dataKey="player2"
               stroke="#3A86FF"
+              strokeWidth={2}
               fill="#3A86FF"
-              fillOpacity={0.4}
+              fillOpacity={0.35}
+              dot={{ fill: '#3A86FF', strokeWidth: 0, r: 4 }}
             />
           )}
           <Legend 
-            formatter={(value) => <span className="text-slate-300">{value}</span>}
+            wrapperStyle={{ paddingTop: '20px' }}
+            formatter={(value) => <span className="text-slate-300 text-xs">{value}</span>}
           />
           <Tooltip content={<CustomTooltip />} />
         </RadarChart>
@@ -238,7 +253,7 @@ export function TrendLineChart({ data, dataKey, color = "#8338EC", className }: 
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis dataKey="name" stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
           <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(99, 102, 241, 0.3)', strokeWidth: 2 }} />
           <Area
             type="monotone"
             dataKey={dataKey}
@@ -281,7 +296,7 @@ export function ParetoChart({ data, valueKey, cumulativeKey, className }: Pareto
             domain={[0, 100]}
             unit="%"
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Legend 
             wrapperStyle={{ paddingTop: "20px" }}
             formatter={(value) => <span className="text-slate-300">{value}</span>}
@@ -323,7 +338,7 @@ export function HorizontalBarChart({ data, valueKey, maxValue, className }: Hori
             tick={{ fill: '#9CA3AF', fontSize: 11 }}
             width={90}
           />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Bar dataKey={valueKey} radius={[0, 4, 4, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
@@ -355,7 +370,7 @@ export function TeamBarChart({ data, valueKey, className }: TeamBarChartProps) {
             height={100}
           />
           <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Bar dataKey={valueKey} radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getTeamColor(entry.name as string)} />
@@ -404,7 +419,7 @@ export function HeatmapChart({ data, className }: HeatmapChartProps) {
             height={80}
           />
           <YAxis stroke="#9CA3AF" tick={{ fill: '#9CA3AF', fontSize: 12 }} />
-          <Tooltip content={<CustomTooltip />} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} />
           <Bar dataKey="value" radius={[4, 4, 0, 0]}>
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={getHeatColor(entry.value)} />

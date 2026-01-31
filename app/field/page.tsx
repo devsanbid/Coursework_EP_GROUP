@@ -216,6 +216,8 @@ export default function CricketFieldPage() {
               { value: "all", label: "All Teams" },
               ...teams.map(t => ({ value: t, label: t.replace(" (NPL)", "") })),
             ]}
+            searchable
+            searchPlaceholder="Search teams..."
           />
           <Select
             label="Player"
@@ -225,6 +227,8 @@ export default function CricketFieldPage() {
               { value: "all", label: "All Players" },
               ...players.map(p => ({ value: p, label: p })),
             ]}
+            searchable
+            searchPlaceholder="Search player..."
           />
           <Select
             label="Match"

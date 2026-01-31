@@ -12,6 +12,8 @@ import {
   Award,
   Activity,
   Download,
+  PieChart,
+  Percent,
 } from "lucide-react";
 import { StatsCard } from "@/components/ui/stats-card";
 import { Card, LoadingSpinner, Badge } from "@/components/ui/common";
@@ -21,6 +23,8 @@ import {
   WinRatePieChart,
   TeamBarChart,
   HorizontalBarChart,
+  ParetoChart,
+  PlayerRadarChart,
 } from "@/components/charts";
 import {
   loadMasterData,
@@ -39,6 +43,8 @@ export default function DescriptivePage() {
   const [selectedSeason, setSelectedSeason] = useState<string>("all");
   const [topBatsmen, setTopBatsmen] = useState<PlayerMatchContribution[]>([]);
   const [topBowlers, setTopBowlers] = useState<PlayerMatchContribution[]>([]);
+  const [selectedPlayer1, setSelectedPlayer1] = useState<string>("");
+  const [selectedPlayer2, setSelectedPlayer2] = useState<string>("");
 
   useEffect(() => {
     async function loadData() {
@@ -192,6 +198,77 @@ export default function DescriptivePage() {
     , teamPerformance[0]);
 
   const topScorer = topBatsmen[0];
+
+  // Calculate Pareto data for run contributors (80/20 rule)
+  const allPlayerRuns = Object.values(
+    masterData.reduce((acc, p) => {
+      if (!acc[p.player_name]) {
+        acc[p.player_name] = { name: p.player_name, runs: 0 };
+      }
+      acc[p.player_name].runs += p.runs_scored;
+      return acc;
+    }, {} as Record<string, { name: string; runs: number }>)
+  ).sort((a, b) => b.runs - a.runs).slice(0, 15);
+
+  const totalRunsForPareto = allPlayerRuns.reduce((sum, p) => sum + p.runs, 0);
+  let cumulativeRuns = 0;
+  const paretoData = allPlayerRuns.map((p) => {
+    cumulativeRuns += p.runs;
+    return {
+      name: p.name.length > 12 ? p.name.substring(0, 12) + "..." : p.name,
+      runs: p.runs,
+      cumulative: Math.round((cumulativeRuns / totalRunsForPareto) * 100),
+    };
+  });
+
+  // Find how many players contribute 80% of runs
+  const players80Percent = paretoData.findIndex(p => p.cumulative >= 80) + 1;
+
+  // Get unique players for comparison
+  const uniquePlayers = [...new Set(masterData.map(p => p.player_name))].sort();
+
+  // Calculate player stats for spider chart
+  const getPlayerStats = (playerName: string) => {
+    const playerMatches = masterData.filter(p => p.player_name === playerName);
+    if (playerMatches.length === 0) return null;
+
+    const totalRuns = playerMatches.reduce((sum, p) => sum + p.runs_scored, 0);
+    const totalWickets = playerMatches.reduce((sum, p) => sum + p.wickets_taken, 0);
+    const totalFours = playerMatches.reduce((sum, p) => sum + p.fours, 0);
+    const totalSixes = playerMatches.reduce((sum, p) => sum + p.sixes, 0);
+    const totalBallsFaced = playerMatches.reduce((sum, p) => sum + p.balls_faced, 0);
+    const avgStrikeRate = totalBallsFaced > 0 ? (totalRuns / totalBallsFaced) * 100 : 0;
+    const matchesPlayed = playerMatches.length;
+
+    // Normalize to 0-100 scale
+    const maxRuns = 600;
+    const maxWickets = 30;
+    const maxFours = 60;
+    const maxSixes = 30;
+    const maxSR = 200;
+
+    return {
+      runs: Math.min((totalRuns / maxRuns) * 100, 100),
+      wickets: Math.min((totalWickets / maxWickets) * 100, 100),
+      fours: Math.min((totalFours / maxFours) * 100, 100),
+      sixes: Math.min((totalSixes / maxSixes) * 100, 100),
+      strikeRate: Math.min((avgStrikeRate / maxSR) * 100, 100),
+      matches: matchesPlayed,
+      rawRuns: totalRuns,
+      rawWickets: totalWickets,
+    };
+  };
+
+  const player1Stats = selectedPlayer1 ? getPlayerStats(selectedPlayer1) : null;
+  const player2Stats = selectedPlayer2 ? getPlayerStats(selectedPlayer2) : null;
+
+  const radarData = player1Stats ? [
+    { subject: "Runs", player1: player1Stats.runs, player2: player2Stats?.runs || 0, fullMark: 100 },
+    { subject: "Wickets", player1: player1Stats.wickets, player2: player2Stats?.wickets || 0, fullMark: 100 },
+    { subject: "Fours", player1: player1Stats.fours, player2: player2Stats?.fours || 0, fullMark: 100 },
+    { subject: "Sixes", player1: player1Stats.sixes, player2: player2Stats?.sixes || 0, fullMark: 100 },
+    { subject: "Strike Rate", player1: player1Stats.strikeRate, player2: player2Stats?.strikeRate || 0, fullMark: 100 },
+  ] : [];
 
   return (
     <div className="space-y-8">
@@ -351,6 +428,154 @@ export default function DescriptivePage() {
           />
         </Card>
       </div>
+
+      {/* Pareto Analysis - 80/20 Rule */}
+      <Card 
+        title="Top Contributors - Pareto Analysis (80/20 Rule)" 
+        subtitle={`${players80Percent} players contribute ~80% of total runs`}
+      >
+        <div className="mb-4 rounded-lg bg-gradient-to-r from-indigo-500/10 to-purple-500/10 p-4 border border-indigo-500/20">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500/20">
+              <Percent className="h-5 w-5 text-indigo-400" />
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold text-white">Pareto Principle (80/20 Rule)</h4>
+              <p className="mt-1 text-xs text-slate-400">
+                The Pareto principle states that roughly 80% of effects come from 20% of causes. 
+                In NPL, <span className="text-indigo-400 font-semibold">{players80Percent} players</span> out of {uniquePlayers.length} ({((players80Percent / uniquePlayers.length) * 100).toFixed(0)}%) 
+                contribute approximately 80% of total runs scored.
+              </p>
+            </div>
+          </div>
+        </div>
+        <ParetoChart 
+          data={paretoData} 
+          valueKey="runs" 
+          cumulativeKey="cumulative" 
+        />
+        <div className="mt-4 flex flex-wrap gap-4 text-xs">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-purple-500"></div>
+            <span className="text-slate-400">Individual Run Contribution</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 rounded bg-yellow-500"></div>
+            <span className="text-slate-400">Cumulative Percentage</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-0.5 w-6 bg-red-500" style={{ borderStyle: 'dashed' }}></div>
+            <span className="text-slate-400">80% Threshold Line</span>
+          </div>
+        </div>
+      </Card>
+
+      {/* Player Comparison Spider Chart */}
+      <Card title="Player Comparison - Spider Chart" subtitle="Compare performance metrics between two players">
+        <div className="mb-4 grid gap-4 md:grid-cols-2">
+          <Select
+            label="Select Player 1"
+            value={selectedPlayer1}
+            onChange={setSelectedPlayer1}
+            options={[
+              { value: "", label: "Select a player..." },
+              ...uniquePlayers.map(p => ({ value: p, label: p }))
+            ]}
+            searchable
+            searchPlaceholder="Search player..."
+          />
+          <Select
+            label="Select Player 2 (Optional)"
+            value={selectedPlayer2}
+            onChange={setSelectedPlayer2}
+            options={[
+              { value: "", label: "Select for comparison..." },
+              ...uniquePlayers.map(p => ({ value: p, label: p }))
+            ]}
+            searchable
+            searchPlaceholder="Search player..."
+          />
+        </div>
+
+        {selectedPlayer1 && player1Stats ? (
+          <>
+            <PlayerRadarChart
+              data={radarData}
+              player1Name={selectedPlayer1}
+              player2Name={selectedPlayer2 || undefined}
+            />
+            
+            {/* Player Stats Summary */}
+            <div className="mt-4 grid gap-4 md:grid-cols-2">
+              {/* Player 1 Stats */}
+              <div className="rounded-xl bg-gradient-to-br from-purple-500/10 to-indigo-500/10 p-4 border border-purple-500/20">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="h-3 w-3 rounded-full bg-purple-500"></div>
+                  <h4 className="font-semibold text-white">{selectedPlayer1}</h4>
+                </div>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-slate-400">Matches</p>
+                    <p className="font-semibold text-white">{player1Stats.matches}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400">Total Runs</p>
+                    <p className="font-semibold text-emerald-400">{player1Stats.rawRuns}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400">Wickets</p>
+                    <p className="font-semibold text-purple-400">{player1Stats.rawWickets}</p>
+                  </div>
+                  <div>
+                    <p className="text-slate-400">Performance</p>
+                    <p className="font-semibold text-indigo-400">
+                      {((player1Stats.runs + player1Stats.wickets + player1Stats.strikeRate) / 3).toFixed(0)}%
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Player 2 Stats */}
+              {selectedPlayer2 && player2Stats && (
+                <div className="rounded-xl bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-4 border border-blue-500/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="h-3 w-3 rounded-full bg-blue-500"></div>
+                    <h4 className="font-semibold text-white">{selectedPlayer2}</h4>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-slate-400">Matches</p>
+                      <p className="font-semibold text-white">{player2Stats.matches}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400">Total Runs</p>
+                      <p className="font-semibold text-emerald-400">{player2Stats.rawRuns}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400">Wickets</p>
+                      <p className="font-semibold text-purple-400">{player2Stats.rawWickets}</p>
+                    </div>
+                    <div>
+                      <p className="text-slate-400">Performance</p>
+                      <p className="font-semibold text-blue-400">
+                        {((player2Stats.runs + player2Stats.wickets + player2Stats.strikeRate) / 3).toFixed(0)}%
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </>
+        ) : (
+          <div className="flex h-[350px] items-center justify-center rounded-xl bg-slate-800/50 border border-slate-700">
+            <div className="text-center">
+              <PieChart className="h-12 w-12 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400">Select a player to view comparison chart</p>
+              <p className="text-xs text-slate-500 mt-1">Compare batting, bowling, and overall performance</p>
+            </div>
+          </div>
+        )}
+      </Card>
 
       {/* Recent Best Players */}
       <Card title="Best Player Per Match" subtitle="Top performers from recent matches">

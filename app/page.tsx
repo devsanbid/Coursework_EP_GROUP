@@ -97,6 +97,19 @@ export default function ShotAnalyzerPage() {
   // Get unique batsmen
   const batsmen = [...new Set(shotData.map((s) => s.batsman_name))].sort();
 
+  // Calculate top 3 batsmen by runs
+  const topBatsmen = batsmen
+    .map((name) => {
+      const playerShots = shotData.filter((s) => s.batsman_name === name);
+      const runs = playerShots.reduce((sum, s) => sum + s.runs, 0);
+      const fours = playerShots.filter((s) => s.shot_type === "four").length;
+      const sixes = playerShots.filter((s) => s.shot_type === "six").length;
+      const shots = playerShots.length;
+      return { name, runs, fours, sixes, shots };
+    })
+    .sort((a, b) => b.runs - a.runs)
+    .slice(0, 3);
+
   // Filter shots by selected batsman
   const filteredShots: ShotData[] = shotData
     .filter((s) => !selectedBatsman || s.batsman_name === selectedBatsman)
@@ -113,15 +126,35 @@ export default function ShotAnalyzerPage() {
     }));
 
   // Calculate statistics
+  // Calculate actual balls faced from master data for accurate strike rate
+  const getPlayerBallsFaced = (batsmanName: string) => {
+    const playerMatches = masterData.filter(
+      (m) => m.player_name === batsmanName && m.balls_faced > 0
+    );
+    return playerMatches.reduce((sum, m) => sum + m.balls_faced, 0);
+  };
+
+  const getTotalBallsFaced = () => {
+    if (selectedBatsman) {
+      return getPlayerBallsFaced(selectedBatsman);
+    }
+    // For all batsmen, sum up unique player balls
+    const uniqueBatsmen = new Set(filteredShots.map(s => s.batsmanName));
+    return Array.from(uniqueBatsmen).reduce((sum, name) => sum + getPlayerBallsFaced(name), 0);
+  };
+
+  const ballsFaced = getTotalBallsFaced();
+  
   const stats = {
     totalShots: filteredShots.length,
     totalRuns: filteredShots.reduce((sum, s) => sum + s.runs, 0),
     fours: filteredShots.filter((s) => s.shotType === "four").length,
     sixes: filteredShots.filter((s) => s.shotType === "six").length,
     dismissals: filteredShots.filter((s) => s.shotType === "out").length,
-    strikeRate: filteredShots.length > 0 
-      ? ((filteredShots.reduce((sum, s) => sum + s.runs, 0) / filteredShots.length) * 100).toFixed(1)
-      : 0,
+    ballsFaced: ballsFaced,
+    strikeRate: ballsFaced > 0 
+      ? ((filteredShots.reduce((sum, s) => sum + s.runs, 0) / ballsFaced) * 100).toFixed(1)
+      : "N/A",
   };
 
   // Zone-wise statistics
@@ -160,6 +193,7 @@ export default function ShotAnalyzerPage() {
 
     const pdf = new jsPDF("p", "mm", "a4");
     const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
 
     // Title
     pdf.setFontSize(24);
@@ -184,7 +218,7 @@ export default function ShotAnalyzerPage() {
     pdf.setFontSize(11);
     const statsY = 65;
     const statsData = [
-      [`Total Shots: ${stats.totalShots}`, `Total Runs: ${stats.totalRuns}`],
+      [`Total Runs: ${stats.totalRuns}`, `Balls Faced: ${stats.ballsFaced}`],
       [`Fours: ${stats.fours}`, `Sixes: ${stats.sixes}`],
       [`Dismissals: ${stats.dismissals}`, `Strike Rate: ${stats.strikeRate}`],
     ];
@@ -212,16 +246,60 @@ export default function ShotAnalyzerPage() {
         zoneY += 7;
       });
 
-    // Capture field visualization
+    // Capture field visualization with error handling for oklab colors
     if (reportRef.current) {
-      const canvas = await html2canvas(reportRef.current, {
-        scale: 2,
-        backgroundColor: "#0F172A",
-      });
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 160;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      pdf.addImage(imgData, "PNG", (pageWidth - imgWidth) / 2, 170, imgWidth, Math.min(imgHeight, 100));
+      try {
+        const canvas = await html2canvas(reportRef.current, {
+          scale: 2,
+          backgroundColor: "#0F172A",
+          useCORS: true,
+          logging: false,
+          // Ignore unsupported CSS features
+          onclone: (clonedDoc) => {
+            // Replace any oklab/oklch colors with fallback hex colors
+            const allElements = clonedDoc.querySelectorAll("*");
+            allElements.forEach((el) => {
+              const htmlEl = el as HTMLElement;
+              const computedStyle = window.getComputedStyle(htmlEl);
+              
+              // Check for gradient backgrounds that might use oklab
+              const bgImage = computedStyle.backgroundImage;
+              if (bgImage && (bgImage.includes("oklab") || bgImage.includes("oklch"))) {
+                htmlEl.style.backgroundImage = "none";
+                htmlEl.style.backgroundColor = "#1E293B";
+              }
+              
+              // Check background color
+              const bgColor = computedStyle.backgroundColor;
+              if (bgColor && (bgColor.includes("oklab") || bgColor.includes("oklch"))) {
+                htmlEl.style.backgroundColor = "#1E293B";
+              }
+              
+              // Check text color
+              const color = computedStyle.color;
+              if (color && (color.includes("oklab") || color.includes("oklch"))) {
+                htmlEl.style.color = "#FFFFFF";
+              }
+            });
+          },
+        });
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 170;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        // Add field image title
+        pdf.setFontSize(14);
+        pdf.setTextColor(0, 0, 0);
+        pdf.text("Shot Map Visualization", 20, 175);
+        
+        // Add the field image
+        pdf.addImage(imgData, "PNG", (pageWidth - imgWidth) / 2, 180, imgWidth, Math.min(imgHeight, 100));
+      } catch (error) {
+        console.error("Error capturing field image:", error);
+        pdf.setFontSize(10);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text("(Field visualization could not be captured)", pageWidth / 2, 190, { align: "center" });
+      }
     }
 
     // Recommendations
@@ -314,6 +392,61 @@ export default function ShotAnalyzerPage() {
         </div>
       </div>
 
+      {/* Top 3 Batsmen Quick Select */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {topBatsmen.map((player, index) => (
+          <motion.button
+            key={player.name}
+            onClick={() => setSelectedBatsman(selectedBatsman === player.name ? "" : player.name)}
+            className={`relative overflow-hidden rounded-xl p-4 text-left transition-all ${
+              selectedBatsman === player.name
+                ? "bg-indigo-600 ring-2 ring-indigo-400"
+                : "bg-gradient-to-br from-slate-800 to-slate-700 hover:from-slate-700 hover:to-slate-600"
+            }`}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            {/* Rank Badge */}
+            <div className={`absolute top-2 right-2 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+              index === 0 ? "bg-yellow-500 text-yellow-900" :
+              index === 1 ? "bg-gray-300 text-gray-700" :
+              "bg-amber-600 text-amber-100"
+            }`}>
+              #{index + 1}
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold ${
+                selectedBatsman === player.name ? "bg-white/20" : "bg-indigo-500/30"
+              }`}>
+                {player.name.split(" ").map(n => n[0]).join("").substring(0, 2)}
+              </div>
+              <div>
+                <p className="font-semibold text-white">{player.name}</p>
+                <p className="text-xs text-slate-300">
+                  {player.runs} runs • {player.shots} shots
+                </p>
+              </div>
+            </div>
+            
+            <div className="mt-3 flex gap-3 text-xs">
+              <span className="px-2 py-1 rounded bg-green-500/20 text-green-400">
+                {player.fours} fours
+              </span>
+              <span className="px-2 py-1 rounded bg-yellow-500/20 text-yellow-400">
+                {player.sixes} sixes
+              </span>
+            </div>
+            
+            {selectedBatsman === player.name && (
+              <div className="absolute bottom-2 right-2">
+                <Eye className="h-4 w-4 text-white/70" />
+              </div>
+            )}
+          </motion.button>
+        ))}
+      </div>
+
       {/* Controls */}
       <Card className="p-4">
         <div className="flex flex-wrap items-center gap-4">
@@ -328,20 +461,23 @@ export default function ShotAnalyzerPage() {
                 { value: "", label: "All Batsmen" },
                 ...batsmen.map((b) => ({ value: b, label: b })),
               ]}
+              searchable
+              searchPlaceholder="Search batsman..."
             />
           </div>
 
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-sm font-medium text-slate-400 mb-1">
+            <label className="block text-sm font-medium text-slate-400 mb-1 flex items-center gap-2">
               Analysis Mode
+              <span className="text-xs text-slate-500 cursor-help" title="Filter the shots displayed on the field">ⓘ</span>
             </label>
             <Select
               value={analysisMode}
               onChange={(value) => setAnalysisMode(value as typeof analysisMode)}
               options={[
-                { value: "shots", label: "All Shots" },
-                { value: "boundaries", label: "Boundaries Only" },
-                { value: "dismissals", label: "Dismissals" },
+                { value: "shots", label: "All Shots - Show every shot played" },
+                { value: "boundaries", label: "Boundaries Only - Only 4s and 6s" },
+                { value: "dismissals", label: "Dismissals - Only wickets (W)" },
               ]}
             />
           </div>
@@ -356,9 +492,19 @@ export default function ShotAnalyzerPage() {
               }`}
             >
               <Settings className="h-4 w-4" />
-              Edit Fielders
+              {showFielderEditor ? "Editing Fielders" : "Edit Fielders"}
             </button>
           </div>
+        </div>
+        
+        {/* Analysis Mode Explanation */}
+        <div className="mt-3 p-3 rounded-lg bg-slate-700/30 border border-slate-600">
+          <p className="text-xs text-slate-400">
+            <strong className="text-slate-300">💡 Mode Explanation:</strong>{" "}
+            {analysisMode === "shots" && "Showing all shots played by the batsman - includes singles, doubles, boundaries, dots, and dismissals."}
+            {analysisMode === "boundaries" && "Showing only boundary shots (4s shown in green, 6s shown in gold) - helps identify where the batsman scores most runs."}
+            {analysisMode === "dismissals" && "Showing only wickets (W in red) - helps identify the batsman's weak zones where they tend to get out."}
+          </p>
         </div>
       </Card>
 
@@ -366,7 +512,7 @@ export default function ShotAnalyzerPage() {
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Cricket Field */}
         <div className="lg:col-span-2" ref={reportRef}>
-          <Card title={`Shot Map${selectedBatsman ? ` - ${selectedBatsman}` : ""}`}>
+          <Card title={`Shot Map${selectedBatsman ? ` - ${selectedBatsman}` : ""}`} subtitle="Click zones to filter • Click again to show all • Hover for details">
             <InteractiveCricketField
               batsman={selectedBatsman || "All"}
               shots={
@@ -378,10 +524,24 @@ export default function ShotAnalyzerPage() {
               }
               fielders={fielders}
               onFielderMove={showFielderEditor ? handleFielderMove : undefined}
-              onZoneClick={setSelectedZone}
+              onZoneClick={(zone) => setSelectedZone(selectedZone === zone ? "" : zone)}
               selectedZone={selectedZone}
               showAnimation={isAnimating}
+              editMode={showFielderEditor}
             />
+            {selectedZone && (
+              <div className="mt-3 flex items-center justify-center gap-2">
+                <span className="text-sm text-slate-400">
+                  Filtering by: <strong className="text-indigo-400 capitalize">{selectedZone.replace(/_/g, " ")}</strong>
+                </span>
+                <button
+                  onClick={() => setSelectedZone("")}
+                  className="text-xs text-red-400 hover:text-red-300 underline"
+                >
+                  Clear filter
+                </button>
+              </div>
+            )}
           </Card>
         </div>
 
@@ -395,8 +555,8 @@ export default function ShotAnalyzerPage() {
                 <p className="text-xs text-slate-400">Total Runs</p>
               </div>
               <div className="rounded-xl bg-slate-700/50 p-4 text-center">
-                <p className="text-2xl font-bold text-white">{stats.totalShots}</p>
-                <p className="text-xs text-slate-400">Total Shots</p>
+                <p className="text-2xl font-bold text-white">{stats.ballsFaced}</p>
+                <p className="text-xs text-slate-400">Balls Faced</p>
               </div>
               <div className="rounded-xl bg-green-500/20 p-4 text-center">
                 <p className="text-2xl font-bold text-green-400">{stats.fours}</p>
@@ -410,7 +570,7 @@ export default function ShotAnalyzerPage() {
                 <p className="text-2xl font-bold text-red-400">{stats.dismissals}</p>
                 <p className="text-xs text-slate-400">Dismissals</p>
               </div>
-              <div className="rounded-xl bg-indigo-500/20 p-4 text-center">
+              <div className="rounded-xl bg-indigo-500/20 p-4 text-center" title="Strike Rate = (Runs / Balls Faced) × 100">
                 <p className="text-2xl font-bold text-indigo-400">{stats.strikeRate}</p>
                 <p className="text-xs text-slate-400">Strike Rate</p>
               </div>

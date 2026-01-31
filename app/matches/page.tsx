@@ -143,6 +143,8 @@ export default function MatchesPage() {
               ...teams.map(t => ({ value: t, label: t.replace(" (NPL)", "") })),
             ]}
             className="w-56"
+            searchable
+            searchPlaceholder="Search teams..."
           />
         </div>
       </div>

@@ -7,22 +7,22 @@ import { usePathname } from "next/navigation";
 import {
   BarChart3,
   Home,
-  Trophy,
-  Users,
-  Target,
+  Search,
   TrendingUp,
+  Lightbulb,
   Menu,
   X,
+  Target,
+  Trophy,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: Home },
-  { name: "Match Analysis", href: "/matches", icon: Trophy },
-  { name: "Team Performance", href: "/teams", icon: BarChart3 },
-  { name: "Player Stats", href: "/players", icon: Users },
-  { name: "Cricket Field", href: "/field", icon: Target },
-  { name: "Insights", href: "/insights", icon: TrendingUp },
+  { name: "Shot Analyzer", href: "/", icon: Target, description: "Interactive cricket field analysis" },
+  { name: "Descriptive", href: "/descriptive", icon: BarChart3, description: "What happened?" },
+  { name: "Diagnostics", href: "/diagnostics", icon: Search, description: "Why did it happen?" },
+  { name: "Predictive", href: "/predictive", icon: TrendingUp, description: "What will happen?" },
+  { name: "Prescriptive", href: "/prescriptive", icon: Lightbulb, description: "What should we do?" },
 ];
 
 export function Sidebar() {
@@ -84,7 +84,7 @@ export function Sidebar() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+          <nav className="flex-1 space-y-2 overflow-y-auto p-4">
             {navigation.map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -93,7 +93,7 @@ export function Sidebar() {
                   href={item.href}
                   onClick={() => setIsMobileOpen(false)}
                   className={cn(
-                    "group relative flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all",
+                    "group relative flex flex-col rounded-xl px-4 py-3 transition-all",
                     isActive
                       ? "bg-indigo-500/20 text-indigo-400"
                       : "text-slate-400 hover:bg-slate-800 hover:text-white"
@@ -106,15 +106,18 @@ export function Sidebar() {
                       transition={{ type: "spring", duration: 0.5 }}
                     />
                   )}
-                  <item.icon
-                    className={cn(
-                      "h-5 w-5 transition-colors",
-                      isActive
-                        ? "text-indigo-400"
-                        : "text-slate-500 group-hover:text-white"
-                    )}
-                  />
-                  {item.name}
+                  <div className="flex items-center gap-3">
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 transition-colors",
+                        isActive
+                          ? "text-indigo-400"
+                          : "text-slate-500 group-hover:text-white"
+                      )}
+                    />
+                    <span className="text-sm font-medium">{item.name}</span>
+                  </div>
+                  <p className="ml-8 text-xs text-slate-500 mt-1">{item.description}</p>
                 </Link>
               );
             })}
@@ -124,10 +127,10 @@ export function Sidebar() {
           <div className="border-t border-slate-700/50 p-4">
             <div className="rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 p-4">
               <p className="text-xs font-medium text-indigo-400">
-                Season 1 & 2 Data
+                Analytics Dashboard
               </p>
               <p className="mt-1 text-xs text-slate-400">
-                64 Matches • 8 Teams • 100+ Players
+                NPL Season 1 & 2 • Advanced Analysis
               </p>
             </div>
           </div>

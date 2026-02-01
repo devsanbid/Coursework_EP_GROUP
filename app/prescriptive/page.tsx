@@ -190,22 +190,118 @@ export default function PrescriptivePage() {
     }
 
     // Opponent-specific recommendations
-    if (opponentData && opponentData.length > 0) {
+    if (opponentData && opponentData.length > 0 && selectedOpponent) {
       const oppAvgScore = opponentData.reduce((sum, d) => sum + d.runs_scored, 0) / opponentData.length;
-      const oppTopScorer = opponentData.reduce((max, d) => (d.runs_scored > max.runs_scored ? d : max), opponentData[0]);
-      const oppTopBowler = opponentData.reduce((max, d) => (d.wickets_taken > max.wickets_taken ? d : max), opponentData[0]);
+      const oppTotalBalls = opponentData.reduce((sum, d) => sum + d.balls_faced, 0);
+      const oppTotalRuns = opponentData.reduce((sum, d) => sum + d.runs_scored, 0);
+      const oppStrikeRate = oppTotalBalls > 0 ? (oppTotalRuns / oppTotalBalls) * 100 : 0;
+      
+      // Find overall top scorer (aggregate runs across all matches)
+      const oppPlayerRuns = new Map<string, number>();
+      opponentData.forEach(d => {
+        oppPlayerRuns.set(d.player_name, (oppPlayerRuns.get(d.player_name) || 0) + d.runs_scored);
+      });
+      const oppTopScorerName = [...oppPlayerRuns.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
+      const oppTopScorerRuns = oppPlayerRuns.get(oppTopScorerName) || 0;
+      
+      // Find overall top bowler (aggregate wickets across all matches)
+      const oppPlayerWickets = new Map<string, number>();
+      opponentData.forEach(d => {
+        oppPlayerWickets.set(d.player_name, (oppPlayerWickets.get(d.player_name) || 0) + d.wickets_taken);
+      });
+      const oppTopBowlerName = [...oppPlayerWickets.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "Unknown";
+      const oppTopBowlerWickets = oppPlayerWickets.get(oppTopBowlerName) || 0;
 
+      // Opponent bowling analysis
+      const oppBowlers = opponentData.filter(d => d.overs_bowled > 0);
+      const oppAvgEconomy = oppBowlers.length > 0 ? oppBowlers.reduce((sum, d) => sum + d.economy_rate, 0) / oppBowlers.length : 0;
+
+      // Head-to-head analysis
+      const h2hData = masterData.filter(d => 
+        (d.team === selectedTeam && d.opposition === selectedOpponent) ||
+        (d.team === selectedOpponent && d.opposition === selectedTeam)
+      );
+      const teamH2HWins = [...new Set(h2hData.filter(d => d.team === selectedTeam && d.match_result === "Win").map(d => d.match_id_unique))].length;
+      const oppH2HWins = [...new Set(h2hData.filter(d => d.team === selectedOpponent && d.match_result === "Win").map(d => d.match_id_unique))].length;
+      const totalH2H = teamH2HWins + oppH2HWins;
+
+      // Add opponent key players recommendation
       recs.push({
         id: "opp-1",
         category: "strategy",
-        title: `Target ${selectedOpponent.replace(" (NPL)", "")} Weaknesses`,
-        description: "Specific strategies against the selected opponent.",
+        title: `Key Players to Watch: ${selectedOpponent.replace(" (NPL)", "")}`,
+        description: `Intelligence on ${selectedOpponent.replace(" (NPL)", "")}'s most dangerous players.`,
         impact: "high",
         actionItems: [
-          `Watch for ${oppTopScorer.player_name} - their top scorer`,
-          `Plan against ${oppTopBowler.player_name} - their main bowler`,
-          oppAvgScore > 25 ? "Focus on early wickets to disrupt batting" : "Their batting is vulnerable - attack early",
-          "Study their death bowling patterns",
+          `Target ${oppTopScorerName} early - their top scorer with ${oppTopScorerRuns} total runs`,
+          `Have a plan for ${oppTopBowlerName} - their strike bowler with ${oppTopBowlerWickets} wickets`,
+          `Their batting strike rate is ${oppStrikeRate.toFixed(1)} - ${oppStrikeRate > 120 ? "expect aggressive play" : "they may struggle to accelerate"}`,
+          `Bowling economy of ${oppAvgEconomy.toFixed(2)} - ${oppAvgEconomy > 8 ? "look to score freely" : "rotate strike and find gaps"}`,
+        ],
+      });
+
+      // Add head-to-head recommendation if there's history
+      if (totalH2H > 0) {
+        recs.push({
+          id: "opp-2",
+          category: "strategy",
+          title: `Head-to-Head Record vs ${selectedOpponent.replace(" (NPL)", "")}`,
+          description: `Historical matchup analysis: ${teamH2HWins}-${oppH2HWins} in ${totalH2H} matches.`,
+          impact: teamH2HWins > oppH2HWins ? "medium" : "high",
+          actionItems: [
+            teamH2HWins > oppH2HWins 
+              ? `You lead ${teamH2HWins}-${oppH2HWins} - maintain psychological advantage`
+              : teamH2HWins < oppH2HWins 
+                ? `They lead ${oppH2HWins}-${teamH2HWins} - time to turn the tide`
+                : `Series tied ${teamH2HWins}-${oppH2HWins} - every game is crucial`,
+            "Review previous match videos for patterns",
+            "Identify what worked and what didn't in past encounters",
+            "Prepare specific match-ups against their key players",
+          ],
+        });
+      }
+
+      // Batting approach against opponent
+      recs.push({
+        id: "opp-3",
+        category: "batting",
+        title: `Batting Strategy vs ${selectedOpponent.replace(" (NPL)", "")}`,
+        description: oppAvgEconomy > 8 
+          ? "Their bowling is expensive - be aggressive from the start."
+          : "Their bowling is tight - build innings carefully.",
+        impact: "high",
+        actionItems: oppAvgEconomy > 8 ? [
+          "Attack from ball one in powerplay",
+          "Target their fifth bowler for big overs",
+          "Set a target of 180+ if batting first",
+          "Don't let them settle into rhythm",
+        ] : [
+          "Respect the new ball in first 3 overs",
+          "Rotate strike to build pressure",
+          "Identify the weaker bowler and target",
+          "Accelerate in death overs when set",
+        ],
+      });
+
+      // Bowling approach against opponent
+      recs.push({
+        id: "opp-4",
+        category: "bowling",
+        title: `Bowling Strategy vs ${selectedOpponent.replace(" (NPL)", "")}`,
+        description: oppStrikeRate > 120 
+          ? "They're aggressive batters - vary your pace and length."
+          : "They struggle to accelerate - keep them under pressure.",
+        impact: "high",
+        actionItems: oppStrikeRate > 120 ? [
+          "Mix up pace with slower balls and bouncers",
+          "Use yorkers in death overs",
+          "Set attacking fields early to get wickets",
+          "Don't be predictable with line and length",
+        ] : [
+          "Bowl tight lines to build dot ball pressure",
+          "Attack stumps to force mistakes",
+          "Use spinners to slow their scoring",
+          "Be patient - they'll make errors under pressure",
         ],
       });
     }

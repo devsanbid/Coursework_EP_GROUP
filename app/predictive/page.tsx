@@ -120,6 +120,8 @@ export default function PredictivePage() {
     const totalRuns = teamData.reduce((sum, d) => sum + d.runs_scored, 0);
     const totalBalls = teamData.reduce((sum, d) => sum + d.balls_faced, 0);
     const totalWickets = teamData.reduce((sum, d) => sum + d.wickets_taken, 0);
+    const totalFours = teamData.reduce((sum, d) => sum + d.fours, 0);
+    const totalSixes = teamData.reduce((sum, d) => sum + d.sixes, 0);
     const bowlers = teamData.filter((d) => d.overs_bowled > 0);
     const avgEconomy = bowlers.length > 0 ? bowlers.reduce((sum, d) => sum + d.economy_rate, 0) / bowlers.length : 0;
 
@@ -137,21 +139,32 @@ export default function PredictivePage() {
     });
     const topBowler = [...playerWickets.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || "N/A";
 
-    // Recent form (last 5 matches)
-    const recentMatches = [...new Set(teamData.map((d) => d.match_id_unique))].slice(-5);
-    const recentForm = recentMatches.map((matchId) => {
+    // Recent form (last 5 unique matches)
+    const matchIds = [...new Set(teamData.map((d) => d.match_id_unique))];
+    const recentMatchIds = matchIds.slice(-5);
+    const recentForm = recentMatchIds.map((matchId) => {
       const matchData = teamData.find((d) => d.match_id_unique === matchId);
-      return matchData?.match_result === "Win" ? "W" : "L";
+      return matchData?.match_result === "Win" ? "W" : matchData?.match_result === "Loss" ? "L" : "T";
     });
+
+    // Calculate boundary runs and scoring patterns
+    const boundaryRuns = (totalFours * 4) + (totalSixes * 6);
+    const avgScore = totalRuns / matches.length || 0;
+    const boundaryPercentage = totalRuns > 0 ? (boundaryRuns / totalRuns) * 100 : 0;
+    
+    // Estimate powerplay (overs 1-6) and death (overs 16-20) based on strike rate patterns
+    // Higher strike rate teams score more in death, boundary-heavy teams score more in powerplay
+    const powerplayFactor = boundaryPercentage > 45 ? 0.38 : 0.32;
+    const deathFactor = (totalBalls > 0 ? (totalRuns / totalBalls) * 100 : 100) > 120 ? 0.42 : 0.36;
 
     return {
       team: teamName,
-      avgScore: totalRuns / matches.length || 0,
+      avgScore,
       avgWickets: totalWickets / matches.length || 0,
       strikeRate: totalBalls > 0 ? (totalRuns / totalBalls) * 100 : 0,
       economyRate: avgEconomy,
-      powerplayRuns: Math.round((totalRuns / matches.length) * 0.35), // Estimated
-      deathOversRuns: Math.round((totalRuns / matches.length) * 0.4), // Estimated
+      powerplayRuns: Math.round(avgScore * powerplayFactor),
+      deathOversRuns: Math.round(avgScore * deathFactor),
       topScorer,
       topBowler,
       recentForm,
@@ -189,19 +202,36 @@ export default function PredictivePage() {
       sortedPlayers.forEach((p) => {
         const avgRuns = p.runs / p.matches;
         const strikeRate = p.balls > 0 ? (p.runs / p.balls) * 100 : 0;
+        const avgWickets = p.wickets / p.matches;
         
         // Determine form based on recent performance
         let form: "Hot" | "Good" | "Average" | "Poor" = "Average";
-        if (avgRuns > 30 || (p.wickets / p.matches) > 1.5) form = "Hot";
-        else if (avgRuns > 20 || (p.wickets / p.matches) > 1) form = "Good";
-        else if (avgRuns < 10 && (p.wickets / p.matches) < 0.5) form = "Poor";
+        let formMultiplier = 1.0;
+        if (avgRuns > 30 || avgWickets > 1.5) {
+          form = "Hot";
+          formMultiplier = 1.1; // 10% boost for hot form
+        } else if (avgRuns > 20 || avgWickets > 1) {
+          form = "Good";
+          formMultiplier = 1.05;
+        } else if (avgRuns < 10 && avgWickets < 0.5) {
+          form = "Poor";
+          formMultiplier = 0.85;
+        }
+
+        // Calculate predicted runs based on average and form (no random)
+        // Use strike rate as confidence factor
+        const srFactor = strikeRate > 120 ? 1.05 : strikeRate < 100 ? 0.95 : 1.0;
+        const predictedRuns = Math.round(avgRuns * formMultiplier * srFactor);
+        
+        // Calculate predicted wickets based on average and form
+        const predictedWickets = Math.round(avgWickets * formMultiplier * 10) / 10;
 
         players.push({
           name: p.name,
           team: teamName,
           role: p.role,
-          predictedRuns: Math.round(avgRuns * (0.9 + Math.random() * 0.3)), // Predicted with variance
-          predictedWickets: Math.round((p.wickets / p.matches) * (0.8 + Math.random() * 0.4)),
+          predictedRuns,
+          predictedWickets,
           impactScore: Math.min(100, p.impactScore / 3),
           form,
           recentAvg: avgRuns,
@@ -392,19 +422,42 @@ export default function PredictivePage() {
       },
     };
 
-    // Key matchups
+    // Key matchups - based on actual performance data
+    // Get batsman's strike rate and bowler's economy to determine advantage
+    const team1TopBatsmanData = masterData.filter(d => d.player_name === team1Stats.topScorer);
+    const team1TopBatsmanSR = team1TopBatsmanData.length > 0 
+      ? team1TopBatsmanData.reduce((s, d) => s + d.strike_rate, 0) / team1TopBatsmanData.length 
+      : 100;
+    const team2TopBowlerData = masterData.filter(d => d.player_name === team2Stats.topBowler && d.overs_bowled > 0);
+    const team2TopBowlerEcon = team2TopBowlerData.length > 0 
+      ? team2TopBowlerData.reduce((s, d) => s + d.economy_rate, 0) / team2TopBowlerData.length 
+      : 8;
+    
+    const team2TopBatsmanData = masterData.filter(d => d.player_name === team2Stats.topScorer);
+    const team2TopBatsmanSR = team2TopBatsmanData.length > 0 
+      ? team2TopBatsmanData.reduce((s, d) => s + d.strike_rate, 0) / team2TopBatsmanData.length 
+      : 100;
+    const team1TopBowlerData = masterData.filter(d => d.player_name === team1Stats.topBowler && d.overs_bowled > 0);
+    const team1TopBowlerEcon = team1TopBowlerData.length > 0 
+      ? team1TopBowlerData.reduce((s, d) => s + d.economy_rate, 0) / team1TopBowlerData.length 
+      : 8;
+
     const keyMatchups = [
       {
         batsman: team1Stats.topScorer,
         bowler: team2Stats.topBowler,
-        advantage: Math.random() > 0.5 ? "Batsman" : "Bowler",
-        reason: "Critical powerplay matchup",
+        advantage: team1TopBatsmanSR > 120 && team2TopBowlerEcon > 7.5 ? "Batsman" 
+                 : team2TopBowlerEcon < 7 ? "Bowler" 
+                 : team1TopBatsmanSR > team2TopBowlerEcon * 15 ? "Batsman" : "Bowler",
+        reason: `SR: ${team1TopBatsmanSR.toFixed(1)} vs Econ: ${team2TopBowlerEcon.toFixed(2)} - Key powerplay matchup`,
       },
       {
         batsman: team2Stats.topScorer,
         bowler: team1Stats.topBowler,
-        advantage: Math.random() > 0.5 ? "Batsman" : "Bowler",
-        reason: "Key death overs battle",
+        advantage: team2TopBatsmanSR > 120 && team1TopBowlerEcon > 7.5 ? "Batsman" 
+                 : team1TopBowlerEcon < 7 ? "Bowler" 
+                 : team2TopBatsmanSR > team1TopBowlerEcon * 15 ? "Batsman" : "Bowler",
+        reason: `SR: ${team2TopBatsmanSR.toFixed(1)} vs Econ: ${team1TopBowlerEcon.toFixed(2)} - Critical death overs battle`,
       },
     ];
 

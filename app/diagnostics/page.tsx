@@ -21,6 +21,8 @@ import {
   ChevronRight,
   Lightbulb,
   PieChart,
+  Coins,
+  Trophy,
 } from "lucide-react";
 import { Card, LoadingSpinner, Badge } from "@/components/ui/common";
 import { Select } from "@/components/ui/select";
@@ -114,6 +116,18 @@ export default function DiagnosticsPage() {
       // Calculate winning reasons
       const winningReasons: { reason: string; impact: string; icon: string; score: number }[] = [];
 
+      const winRate = (uniqueWins / teamMatches.length) * 100;
+      
+      // Strong win rate
+      if (winRate > 55) {
+        winningReasons.push({
+          reason: "Strong Win Rate",
+          impact: `${winRate.toFixed(1)}% win rate (${uniqueWins}W/${uniqueLosses}L) shows consistent performance`,
+          icon: "trophy",
+          score: Math.min(100, winRate),
+        });
+      }
+
       if (battingAvg > 20) {
         winningReasons.push({
           reason: "Strong Batting Average",
@@ -123,12 +137,12 @@ export default function DiagnosticsPage() {
         });
       }
 
-      if (strikeRate > 120) {
+      if (strikeRate > 118) {
         winningReasons.push({
           reason: "High Strike Rate",
           impact: `Strike rate of ${strikeRate.toFixed(1)} shows aggressive batting`,
           icon: "zap",
-          score: Math.min(100, strikeRate * 0.7),
+          score: Math.min(100, (strikeRate / 130) * 100),
         });
       }
 
@@ -141,30 +155,49 @@ export default function DiagnosticsPage() {
         });
       }
 
-      if (totalWickets > 50) {
+      if (totalWickets > 100) {
         winningReasons.push({
           reason: "Wicket-Taking Ability",
           impact: `${totalWickets} wickets shows strong bowling attack`,
           icon: "target",
-          score: Math.min(100, totalWickets * 1.5),
+          score: Math.min(100, (totalWickets / 150) * 100),
         });
       }
 
-      if (totalSixes > 30) {
+      if (totalSixes > 90) {
         winningReasons.push({
           reason: "Power Hitting",
           impact: `${totalSixes} sixes demonstrates big-hitting capability`,
           icon: "power",
-          score: Math.min(100, totalSixes * 2),
+          score: Math.min(100, (totalSixes / 130) * 100),
         });
       }
 
-      if (winsAfterTossWin > uniqueWins * 0.4) {
+      // Calculate toss win percentage
+      const tossWinMatches = [...new Set(tossWins.map(d => d.match_id_unique))].length;
+      const matchWinsAfterToss = [...new Set(tossWins.filter(d => d.match_result === "Win").map(d => d.match_id_unique))].length;
+      const tossConversionRate = tossWinMatches > 0 ? (matchWinsAfterToss / tossWinMatches) * 100 : 0;
+      
+      // Show toss utilization if team has won tosses and converted well
+      if (tossWinMatches > 0 && tossConversionRate >= 45) {
         winningReasons.push({
           reason: "Toss Advantage Utilization",
-          impact: `Converts toss wins to match wins effectively`,
+          impact: `Won ${matchWinsAfterToss} of ${tossWinMatches} matches after winning toss (${tossConversionRate.toFixed(0)}% conversion)`,
           icon: "coin",
-          score: 70,
+          score: Math.min(100, tossConversionRate),
+        });
+      }
+      
+      // Show toss independence for teams that win despite not winning many tosses
+      const tossLossMatches = teamMatches.length - tossWinMatches;
+      const winsAfterTossLoss = uniqueWins - matchWinsAfterToss;
+      const tossIndependenceRate = tossLossMatches > 0 ? (winsAfterTossLoss / tossLossMatches) * 100 : 0;
+      if (tossLossMatches > 3 && tossIndependenceRate > 60) {
+        winningReasons.push({
+          reason: "Toss Independence",
+          impact: `Won ${winsAfterTossLoss} of ${tossLossMatches} matches even after losing toss (${tossIndependenceRate.toFixed(0)}% win rate)`,
+          icon: "coin",
+          score: Math.min(100, tossIndependenceRate),
         });
       }
 
@@ -190,12 +223,12 @@ export default function DiagnosticsPage() {
         });
       }
 
-      if (strikeRate < 115) {
+      if (strikeRate < 112) {
         losingReasons.push({
           reason: "Slow Scoring Rate",
           impact: `Strike rate of ${strikeRate.toFixed(1)} indicates lack of aggressive batting`,
           icon: "zap",
-          score: Math.min(100, (130 - strikeRate) * 1.2),
+          score: Math.min(100, (120 - strikeRate) * 1.5),
         });
       }
 
@@ -208,12 +241,12 @@ export default function DiagnosticsPage() {
         });
       }
 
-      if (totalWickets < 40) {
+      if (totalWickets < 90) {
         losingReasons.push({
           reason: "Weak Wicket-Taking",
           impact: `Only ${totalWickets} wickets shows inability to break partnerships`,
           icon: "target",
-          score: Math.min(100, (50 - totalWickets) * 2.5),
+          score: Math.min(100, (100 - totalWickets) * 1.5),
         });
       }
 
@@ -226,14 +259,18 @@ export default function DiagnosticsPage() {
         });
       }
 
-      const tossLosses = teamData.filter((d) => d.toss_winner !== teamName);
-      const lossesAfterTossLoss = tossLosses.filter((d) => d.match_result === "Loss").length;
-      if (lossesAfterTossLoss > uniqueLosses * 0.5) {
+      const tossLossMatchData = teamData.filter((d) => d.toss_winner !== teamName);
+      const uniqueTossLossMatchCount = [...new Set(tossLossMatchData.map(d => d.match_id_unique))].length;
+      const matchLossesAfterTossLoss = [...new Set(tossLossMatchData.filter(d => d.match_result === "Loss").map(d => d.match_id_unique))].length;
+      const tossLossRate = uniqueTossLossMatchCount > 0 ? (matchLossesAfterTossLoss / uniqueTossLossMatchCount) * 100 : 0;
+      
+      // Show poor toss recovery if loss rate is above 50%
+      if (uniqueTossLossMatchCount > 0 && tossLossRate >= 50) {
         losingReasons.push({
           reason: "Poor Toss Recovery",
-          impact: `Struggles to win when losing the toss`,
+          impact: `Lost ${matchLossesAfterTossLoss} of ${uniqueTossLossMatchCount} matches after losing toss (${tossLossRate.toFixed(0)}% loss rate)`,
           icon: "coin",
-          score: 65,
+          score: Math.min(100, tossLossRate),
         });
       }
 
@@ -246,12 +283,12 @@ export default function DiagnosticsPage() {
         });
       }
 
-      if (totalSixes < 20) {
+      if (totalSixes < 85) {
         losingReasons.push({
           reason: "Lack of Power Hitting",
           impact: `Only ${totalSixes} sixes shows inability to accelerate`,
           icon: "power",
-          score: Math.min(100, (30 - totalSixes) * 4),
+          score: Math.min(100, (90 - totalSixes) * 2),
         });
       }
 
@@ -722,12 +759,13 @@ export default function DiagnosticsPage() {
                             className="flex items-start gap-3 p-3 rounded-xl bg-gradient-to-r from-green-500/10 to-emerald-500/5 border border-green-500/20"
                           >
                             <div className="w-8 h-8 rounded-lg bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                              {reason.icon === "trophy" && <Trophy className="h-4 w-4 text-green-400" />}
                               {reason.icon === "bat" && <Target className="h-4 w-4 text-green-400" />}
                               {reason.icon === "zap" && <Zap className="h-4 w-4 text-green-400" />}
                               {reason.icon === "shield" && <Shield className="h-4 w-4 text-green-400" />}
                               {reason.icon === "target" && <Target className="h-4 w-4 text-green-400" />}
                               {reason.icon === "power" && <TrendingUp className="h-4 w-4 text-green-400" />}
-                              {reason.icon === "coin" && <Award className="h-4 w-4 text-green-400" />}
+                              {reason.icon === "coin" && <Coins className="h-4 w-4 text-green-400" />}
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center justify-between">
@@ -786,7 +824,7 @@ export default function DiagnosticsPage() {
                             {reason.icon === "shield" && <Shield className="h-4 w-4 text-red-400" />}
                             {reason.icon === "target" && <Target className="h-4 w-4 text-red-400" />}
                             {reason.icon === "power" && <TrendingDown className="h-4 w-4 text-red-400" />}
-                            {reason.icon === "coin" && <Award className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "coin" && <Coins className="h-4 w-4 text-red-400" />}
                             {reason.icon === "trend" && <TrendingDown className="h-4 w-4 text-red-400" />}
                             {reason.icon === "collapse" && <AlertTriangle className="h-4 w-4 text-red-400" />}
                           </div>

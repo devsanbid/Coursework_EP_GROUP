@@ -168,6 +168,93 @@ export default function DiagnosticsPage() {
         });
       }
 
+      // Calculate losing reasons - why team loses
+      const losingReasons: { reason: string; impact: string; icon: string; score: number }[] = [];
+
+      // Loss analysis stats
+      const avgRunsInLosses = losses.reduce((sum, d) => sum + d.runs_scored, 0) / losses.length || 0;
+      const avgWicketsInLosses = losses.filter(d => d.wickets_taken > 0).reduce((sum, d) => sum + d.wickets_taken, 0) / losses.filter(d => d.wickets_taken > 0).length || 0;
+      const lossStrikeRate = losses.reduce((sum, d) => sum + d.balls_faced, 0) > 0 
+        ? (losses.reduce((sum, d) => sum + d.runs_scored, 0) / losses.reduce((sum, d) => sum + d.balls_faced, 0)) * 100 
+        : 0;
+      const lossEconomy = losses.filter(d => d.overs_bowled > 0).length > 0
+        ? losses.filter(d => d.overs_bowled > 0).reduce((sum, d) => sum + d.economy_rate, 0) / losses.filter(d => d.overs_bowled > 0).length
+        : 0;
+
+      if (battingAvg < 18) {
+        losingReasons.push({
+          reason: "Low Batting Average",
+          impact: `${battingAvg.toFixed(1)} runs per batsman is below league average`,
+          icon: "bat",
+          score: Math.min(100, (20 - battingAvg) * 8),
+        });
+      }
+
+      if (strikeRate < 115) {
+        losingReasons.push({
+          reason: "Slow Scoring Rate",
+          impact: `Strike rate of ${strikeRate.toFixed(1)} indicates lack of aggressive batting`,
+          icon: "zap",
+          score: Math.min(100, (130 - strikeRate) * 1.2),
+        });
+      }
+
+      if (avgEconomy > 8.5) {
+        losingReasons.push({
+          reason: "Expensive Bowling",
+          impact: `Economy of ${avgEconomy.toFixed(2)} allows opponents to score freely`,
+          icon: "shield",
+          score: Math.min(100, (avgEconomy - 6) * 20),
+        });
+      }
+
+      if (totalWickets < 40) {
+        losingReasons.push({
+          reason: "Weak Wicket-Taking",
+          impact: `Only ${totalWickets} wickets shows inability to break partnerships`,
+          icon: "target",
+          score: Math.min(100, (50 - totalWickets) * 2.5),
+        });
+      }
+
+      if (uniqueLosses > uniqueWins) {
+        losingReasons.push({
+          reason: "Negative Win-Loss Ratio",
+          impact: `${uniqueLosses} losses vs ${uniqueWins} wins shows inconsistency`,
+          icon: "trend",
+          score: Math.min(100, ((uniqueLosses - uniqueWins) / teamMatches.length) * 150),
+        });
+      }
+
+      const tossLosses = teamData.filter((d) => d.toss_winner !== teamName);
+      const lossesAfterTossLoss = tossLosses.filter((d) => d.match_result === "Loss").length;
+      if (lossesAfterTossLoss > uniqueLosses * 0.5) {
+        losingReasons.push({
+          reason: "Poor Toss Recovery",
+          impact: `Struggles to win when losing the toss`,
+          icon: "coin",
+          score: 65,
+        });
+      }
+
+      if (avgRunsInLosses < avgRunsInWins * 0.7) {
+        losingReasons.push({
+          reason: "Collapse in Losing Games",
+          impact: `Avg ${avgRunsInLosses.toFixed(1)} runs in losses vs ${avgRunsInWins.toFixed(1)} in wins`,
+          icon: "collapse",
+          score: Math.min(100, ((avgRunsInWins - avgRunsInLosses) / avgRunsInWins) * 100),
+        });
+      }
+
+      if (totalSixes < 20) {
+        losingReasons.push({
+          reason: "Lack of Power Hitting",
+          impact: `Only ${totalSixes} sixes shows inability to accelerate`,
+          icon: "power",
+          score: Math.min(100, (30 - totalSixes) * 4),
+        });
+      }
+
       return {
         teamMatches: teamMatches.length,
         wins: uniqueWins,
@@ -185,7 +272,9 @@ export default function DiagnosticsPage() {
         topScorer,
         topWicketTaker,
         winningReasons,
+        losingReasons,
         avgRunsInWins,
+        avgRunsInLosses,
         avgWicketsInWins,
       };
     };
@@ -675,6 +764,58 @@ export default function DiagnosticsPage() {
                     )}
                   </Card>
                 </div>
+
+                {/* Why Team Loses Section */}
+                <Card 
+                  title={`Why ${selectedTeam.replace(" (NPL)", "")} Loses`} 
+                  subtitle="Key factors contributing to losses"
+                >
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {selectedTeamData.losingReasons && selectedTeamData.losingReasons.length > 0 ? (
+                      selectedTeamData.losingReasons.map((reason, idx) => (
+                        <motion.div
+                          key={reason.reason}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="flex items-start gap-3 p-3 rounded-xl bg-gradient-to-r from-red-500/10 to-rose-500/5 border border-red-500/20"
+                        >
+                          <div className="w-8 h-8 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                            {reason.icon === "bat" && <Target className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "zap" && <Zap className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "shield" && <Shield className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "target" && <Target className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "power" && <TrendingDown className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "coin" && <Award className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "trend" && <TrendingDown className="h-4 w-4 text-red-400" />}
+                            {reason.icon === "collapse" && <AlertTriangle className="h-4 w-4 text-red-400" />}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <p className="text-sm font-medium text-red-400">{reason.reason}</p>
+                              <span className="text-xs text-slate-400">{reason.score.toFixed(0)}%</span>
+                            </div>
+                            <p className="text-xs text-slate-300 mt-1">{reason.impact}</p>
+                            <div className="mt-2 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${reason.score}%` }}
+                                transition={{ delay: 0.5, duration: 0.8 }}
+                                className="h-full bg-gradient-to-r from-red-500 to-rose-400 rounded-full"
+                              />
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))
+                    ) : (
+                      <div className="col-span-2 text-center py-8 text-slate-400">
+                        <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500 opacity-50" />
+                        <p className="text-sm">No significant losing factors identified</p>
+                        <p className="text-xs text-slate-500 mt-1">Team is performing well across all metrics</p>
+                      </div>
+                    )}
+                  </div>
+                </Card>
 
                 {/* Top Performers */}
                 <Card title="Top Performers" subtitle="Key players driving team success">

@@ -416,7 +416,34 @@ The system evaluates multiple performance thresholds to identify success factors
 | Power Hitting | S_total > 30 | min(100, S_total × 2) |
 | Toss Utilization | W_after_toss > 0.4 × W_total | Fixed score: 70 |
 
-### 9.3 Player Performance Classification
+---
+
+### 9.3 Team Losing Reasons Analysis
+
+The system identifies factors contributing to team losses:
+
+| Factor | Threshold | Score Formula |
+|--------|-----------|---------------|
+| Low Batting Average | X̄_bat < 18 | min(100, (20 - X̄_bat) × 8) |
+| Slow Scoring Rate | SR < 115 | min(100, (130 - SR) × 1.2) |
+| Expensive Bowling | Econ > 8.5 | min(100, (Econ - 6) × 20) |
+| Weak Wicket-Taking | W_total < 40 | min(100, (50 - W_total) × 2.5) |
+| Negative Win-Loss Ratio | L > W | min(100, ((L - W) / n) × 150) |
+| Poor Toss Recovery | L_after_toss > 0.5 × L_total | Fixed score: 65 |
+| Collapse in Losses | R̄_loss < 0.7 × R̄_win | min(100, ((R̄_win - R̄_loss) / R̄_win) × 100) |
+| Lack of Power Hitting | S_total < 20 | min(100, (30 - S_total) × 4) |
+
+Where:
+- L = Total losses
+- W = Total wins
+- n = Total matches
+- R̄_loss = Average runs in losing games
+- R̄_win = Average runs in winning games
+- S_total = Total sixes
+
+---
+
+### 9.4 Player Performance Classification
 
 **Strength Indicators:**
 - Total runs > 200 → "Consistent Run Scorer"
@@ -430,7 +457,7 @@ The system evaluates multiple performance thresholds to identify success factors
 - Strike rate < 100 (with runs > 100) → "Conservative Approach"
 - Economy > 9 (with overs > 10) → "Expensive Bowling"
 
-### 9.4 Player Overall Rating
+### 9.5 Player Overall Rating
 
 $$\text{Rating} = R_{bat} + R_{SR} + R_{bowl} + R_{econ} + R_{field}$$
 

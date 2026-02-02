@@ -29,10 +29,11 @@ import {
 import {
   loadMasterData,
   loadTeamPerformance,
+  loadBowlingStats,
   calculateBestPlayerPerMatch,
   calculateTopPlayers,
 } from "@/lib/data";
-import { PlayerMatchData, TeamPerformance, PlayerMatchContribution } from "@/lib/types";
+import { PlayerMatchData, TeamPerformance, PlayerMatchContribution, BowlingStats } from "@/lib/types";
 import { getTeamShortName, formatPercentage } from "@/lib/utils";
 
 export default function DescriptivePage() {
@@ -42,27 +43,41 @@ export default function DescriptivePage() {
   const [bestPlayers, setBestPlayers] = useState<PlayerMatchContribution[]>([]);
   const [selectedSeason, setSelectedSeason] = useState<string>("all");
   const [topBatsmen, setTopBatsmen] = useState<PlayerMatchContribution[]>([]);
-  const [topBowlers, setTopBowlers] = useState<PlayerMatchContribution[]>([]);
+  const [topBowlers, setTopBowlers] = useState<{ name: string; wickets: number }[]>([]);
+  const [bowlingStats, setBowlingStats] = useState<BowlingStats[]>([]);
   const [selectedPlayer1, setSelectedPlayer1] = useState<string>("");
   const [selectedPlayer2, setSelectedPlayer2] = useState<string>("");
 
   useEffect(() => {
     async function loadData() {
       try {
-        const [master, performance] = await Promise.all([
+        const [master, performance, bowling] = await Promise.all([
           loadMasterData(),
           loadTeamPerformance(),
+          loadBowlingStats(),
         ]);
 
         setMasterData(master);
         setTeamPerformance(performance);
+        setBowlingStats(bowling);
 
         const best = calculateBestPlayerPerMatch(master);
         setBestPlayers(best);
 
         const allTopPlayers = calculateTopPlayers(master, 1, 10);
         setTopBatsmen(allTopPlayers.batsmen);
-        setTopBowlers(allTopPlayers.bowlers);
+        
+        // Calculate top bowlers from npl_master for Season 1
+        const season1Data = master.filter(d => d.season === 1);
+        const bowlerStats = new Map<string, number>();
+        season1Data.forEach(d => {
+          bowlerStats.set(d.player_name, (bowlerStats.get(d.player_name) || 0) + d.wickets_taken);
+        });
+        const sortedBowlers = [...bowlerStats.entries()]
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, wickets]) => ({ name, wickets }));
+        setTopBowlers(sortedBowlers);
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -74,13 +89,34 @@ export default function DescriptivePage() {
   }, []);
 
   useEffect(() => {
-    if (masterData.length > 0) {
+    if (masterData.length > 0 && bowlingStats.length > 0) {
       const seasonNum = selectedSeason === "all" ? 1 : parseInt(selectedSeason);
-      const { batsmen, bowlers } = calculateTopPlayers(masterData, seasonNum, 10);
+      const { batsmen } = calculateTopPlayers(masterData, seasonNum, 10);
       setTopBatsmen(batsmen);
-      setTopBowlers(bowlers);
+      
+      if (seasonNum === 2) {
+        // Use bowling_stats.csv for Season 2 (more accurate)
+        const sortedBowlers = [...bowlingStats]
+          .sort((a, b) => b.wickets - a.wickets)
+          .slice(0, 10)
+          .map(b => ({ name: b.player, wickets: b.wickets }));
+        setTopBowlers(sortedBowlers);
+      } else {
+        // Use npl_master for Season 1
+        const seasonData = masterData.filter(d => d.season === seasonNum);
+        const bowlerStats = new Map<string, number>();
+        seasonData.forEach(d => {
+          bowlerStats.set(d.player_name, (bowlerStats.get(d.player_name) || 0) + d.wickets_taken);
+        });
+        const sortedBowlers = [...bowlerStats.entries()]
+          .filter(([, wickets]) => wickets > 0)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 10)
+          .map(([name, wickets]) => ({ name, wickets }));
+        setTopBowlers(sortedBowlers);
+      }
     }
-  }, [selectedSeason, masterData]);
+  }, [selectedSeason, masterData, bowlingStats]);
 
   // Download report function
   const downloadReport = async () => {
@@ -154,7 +190,7 @@ export default function DescriptivePage() {
     pdf.setFontSize(10);
     yPos += 20;
     topBowlers.slice(0, 5).forEach((player, i) => {
-      pdf.text(`${i + 1}. ${player.player_name}: ${player.wickets} wickets`, 25, yPos);
+      pdf.text(`${i + 1}. ${player.name}: ${player.wickets} wickets`, 25, yPos);
       yPos += 7;
     });
 
@@ -419,9 +455,9 @@ export default function DescriptivePage() {
         >
           <HorizontalBarChart
             data={topBowlers.map(p => ({
-              name: p.player_name.length > 15
-                ? p.player_name.substring(0, 15) + "..."
-                : p.player_name,
+              name: p.name.length > 15
+                ? p.name.substring(0, 15) + "..."
+                : p.name,
               value: p.wickets
             }))}
             valueKey="value"
